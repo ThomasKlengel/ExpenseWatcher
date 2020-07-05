@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29728.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpanseWatcher", "ExpanseWatcher\ExpanseWatcher.csproj", "{A774944A-4FAB-4F15-9CD7-CDF35DCDDF60}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A774944A-4FAB-4F15-9CD7-CDF35DCDDF60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A774944A-4FAB-4F15-9CD7-CDF35DCDDF60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A774944A-4FAB-4F15-9CD7-CDF35DCDDF60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A774944A-4FAB-4F15-9CD7-CDF35DCDDF60}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EB2F0FB6-9F1D-4E31-A34B-3681D0210727}
+	EndGlobalSection
+EndGlobal
