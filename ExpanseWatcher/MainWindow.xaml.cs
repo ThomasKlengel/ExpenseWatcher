@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Xml;
+using System.Xml.Linq;
+using System.Linq;
 
-namespace ExpanseWatcher2
+namespace ExpanseWatcher
 {
     /// <summary>
     /// Interaktionslogik für MainWindow.xaml
@@ -14,22 +17,40 @@ namespace ExpanseWatcher2
     {
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent();            
             ReadImap();
+        }
+
+        /// <summary>
+        /// Reads the credentials to log into gmail from a file.
+        /// </summary>
+        /// <param name="user">The user name to log in with.</param>
+        /// <param name="password">The password to use.</param>
+        private void GetCredentials(out string user, out string password)
+        {
+            var doc = XDocument.Load("Credentials.xml");
+
+            user = doc.Root.Element("User").Attribute("value").Value;
+            password = doc.Root.Element("Password").Attribute("value").Value;
         }
 
         public void ReadImap()
         {
+            var currentPayments = DataBaseHelper.GetPaymentsFromDB();
+            var date = currentPayments.Last().DateOfPayment;
+
+            GetCredentials(out string user, out string pw);
+
             var mailRepository = new MailRepository(
                                     "imap.gmail.com",
                                     993,
                                     true,
-                                    "",
-                                    ""
+                                    user,
+                                    pw
                                 );
 
-            var emailList = mailRepository.GetAllMails("PayPal");
-            var payments = new List<Payment>();
+            var emailList = mailRepository.GetMailsSince("PayPal", new DateTime(date.Year,date.Month,date.Day));
+            var newPayments = new List<Payment>();
 
             var regexStrings = new List<string>();
             regexStrings.Add("Sie haben eine (Zahlung|Bestellung) über \\W{0,1}(\\d+[,.]\\d{2})\\sEUR an (.*) (genehmigt|gesendet|autorisiert)");
@@ -55,49 +76,29 @@ namespace ExpanseWatcher2
                     break;
                 }
 
+                // continue to next email if the text didnt match any of the regular expressions
                 if (!success)
                 {
                     continue;
                 }
-                // otherwise output data
-                var PaymentText = match.Value;
+
+                // otherwise fetch data
                 var priceText = match.Groups[2].Value;
                 var shop = match.Groups[3].Value;
                 double.TryParse(priceText, out double price);
 
-                Debug.WriteLine($"From: {email.From}\r\nSubject: {email.Subject}\r\nMessage:{PaymentText}");
-                if (email.Attachments.Count > 0)
+                // put data into a class
+                newPayments.Add(new Payment(price, shop, new DateTimeOffset(email.Date.Ticks, new TimeSpan(0))));               
+            }
+
+            foreach (var payment in newPayments)
+            {
+                if (currentPayments.Any(curPay=> curPay.Equals(payment)))
                 {
-                    Debug.WriteLine("Attachements:");
-                    foreach (MimePart attachment in email.Attachments)
-                    {
-                        Debug.WriteLine("Attachment: {0} {1}", attachment.ContentName, attachment.ContentType.MimeType);
-                    }
+                    continue;
                 }
-
-                payments.Add(new Payment(price, shop, new DateTimeOffset(email.Date.Ticks, new TimeSpan(0))));
-
+                DataBaseHelper.AddPaymentToDB(payment);
             }
         }
-    }
-
-    class Payment
-    {
-        public double Price { get;  }
-
-        public string Shop { get;  }
-
-        public DateTimeOffset DateOfPayment { get;  }
-
-        public Payment (double price, string shop, DateTimeOffset date)
-        {
-            Price = price;
-            Shop = shop;
-            DateOfPayment = date;
-        }
-
-        public Payment(double price, string shop) : this(price, shop, DateTimeOffset.UtcNow) { }
-
-
     }
 }
