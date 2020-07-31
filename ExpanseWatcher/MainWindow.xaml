@@ -4,10 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ExpanseWatcher"
+        xmlns:vms="clr-namespace:ExpanseWatcher.ViewModels"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.DataContext>
+        <vms:MainWindowVM/>
+    </Window.DataContext>
     <Grid>
         <Frame Content="{Binding DisplayPage}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-
     </Grid>
 </Window>

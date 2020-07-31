@@ -19,23 +19,7 @@ namespace ExpanseWatcher
         public MainWindow()
         {
             InitializeComponent();
-            
-            this.DataContext = new ViewModel();
-            //MailRepository.ReadImap();
-        }
-
-        
-
-    }
-
-    public class ViewModel
-    {
-        public Page DisplayPage { get; set; }
-
-        public ViewModel ()
-        {
-            DisplayPage = new Views.NameReplacements();
-        }
+        }      
 
     }
 }

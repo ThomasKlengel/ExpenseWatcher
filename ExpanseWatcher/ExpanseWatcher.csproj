@@ -119,8 +119,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Globals.cs" />
+    <Compile Include="ViewModels\MainWindowVM.cs" />
     <Compile Include="ViewModels\NameReplacementsVM.cs" />
     <Compile Include="ViewModels\ReplacementVM.cs" />
+    <Compile Include="Views\ExpenseOverview.xaml.cs">
+      <DependentUpon>ExpenseOverview.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\NameReplacements.xaml.cs">
       <DependentUpon>NameReplacements.xaml</DependentUpon>
     </Compile>
@@ -140,6 +145,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\ExpenseOverview.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\NameReplacements.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
