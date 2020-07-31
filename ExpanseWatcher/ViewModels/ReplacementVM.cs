@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ViewModel.Base;
+﻿using SQLite;
+using ViewModel;
 
 namespace ExpanseWatcher.ViewModels
 {
     public class ReplacementVM: BaseViewModel
     {
+
+
         private string _original;
+        [PrimaryKey]
         public string Original
         {
             get { return _original; }
@@ -18,7 +17,7 @@ namespace ExpanseWatcher.ViewModels
                 if (_original != value)
                 {
                     _original = value;
-                    NotifyPropertyChanged();
+                    OnPropertyChanged();
                 }
             }
         }
@@ -32,7 +31,7 @@ namespace ExpanseWatcher.ViewModels
                 if (_replaced != value)
                 {
                     _replaced = value;
-                    NotifyPropertyChanged();
+                    OnPropertyChanged();
                 }
             }
         }

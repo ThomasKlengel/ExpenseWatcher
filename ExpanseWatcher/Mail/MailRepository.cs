@@ -109,7 +109,7 @@ namespace ExpanseWatcher
         public static void ReadImap()
         {
             var currentPayments = DataBaseHelper.GetPaymentsFromDB();
-            DateTimeOffset date = currentPayments?.Last().DateOfPayment != null
+            DateTimeOffset date = (currentPayments?.Count > 0)
                 ? currentPayments.Last().DateOfPayment
                 : new DateTimeOffset(DateTime.Today.AddYears(-10));
 
@@ -124,7 +124,6 @@ namespace ExpanseWatcher
                                 );
 
             var emailList = mailRepository.GetMailsSince("PayPal", new DateTime(date.Year, date.Month, date.Day));
-            //var emailList = mailRepository.GetAllMails("PayPal");
             var newPayments = new List<Payment>();
 
             var regexStrings = new List<string>();
@@ -162,8 +161,28 @@ namespace ExpanseWatcher
                 var shop = match.Groups[6].Value;
                 double.TryParse(priceText, out double price);
 
+                // get transaction and authorization
+                Regex transaktion = new Regex("Transaktionscode:\\s*([\\r\\n]|)\\s*(\\w{17})");
+                Regex autorisierung = new Regex("Autorisierungscode:\\s*([\\r\\n]|)\\s*(\\w{6})");
+                var tmatch = transaktion.Match(email.BodyHtml.TextStripped);
+                string trans = "";
+                if (tmatch.Success)
+                {
+                    trans = tmatch.Groups[2].Value;
+                }
+                else
+                {
+                    continue;
+                }
+                var amatch = autorisierung.Match(email.BodyHtml.TextStripped);
+                string auth = "";
+                if (amatch.Success)
+                {
+                    auth = amatch.Groups[2].Value;
+                }
+
                 // put data into a class
-                newPayments.Add(new Payment(price, shop, new DateTimeOffset(email.Date.Ticks, new TimeSpan(0))));
+                newPayments.Add(new Payment(price, shop, new DateTimeOffset(email.Date.Ticks, new TimeSpan(0)), trans, auth));
             }
 
             foreach (var payment in newPayments)

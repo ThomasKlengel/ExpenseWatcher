@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ViewModel.Base;
+using ViewModel;
 
 namespace ExpanseWatcher.ViewModels
 {
@@ -17,9 +17,6 @@ namespace ExpanseWatcher.ViewModels
         public NameReplacementsVM()
         {
             Replacements = new ObservableCollection<ReplacementVM>();
-            Replacements.Add(new ReplacementVM("Netto Markendiscount", "Netto"));
-            Replacements.Add(new ReplacementVM("Kaufland GmbH", "Kaufland"));
-            Replacements.Add(new ReplacementVM("Aldi Gmbh und Co", "Aldi"));
             foreach (var rep in ExpanseWatcher.DataBaseHelper.GetReplacementsFromDB())
             {
                 if (!Replacements.Any(repl => repl.Original == rep.Original))

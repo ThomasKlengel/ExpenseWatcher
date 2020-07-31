@@ -108,7 +108,7 @@
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="ViewModel">
-      <HintPath>..\..\ViewModel\ViewModel\bin\Release\ViewModel.dll</HintPath>
+      <HintPath>..\..\ViewModel\ViewModel\bin\Debug\ViewModel.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />

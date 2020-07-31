@@ -27,6 +27,8 @@ namespace ExpanseWatcher.Views
         {
             InitializeComponent();
 
+            MailRepository.ReadImap();
+
             this.DataContext = new ViewModels.NameReplacementsVM();
         }
     }
