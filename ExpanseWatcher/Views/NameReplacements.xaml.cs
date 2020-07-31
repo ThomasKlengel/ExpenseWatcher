@@ -27,67 +27,8 @@ namespace ExpanseWatcher.Views
         {
             InitializeComponent();
 
-            this.DataContext = new NRViewModel();
+            this.DataContext = new ViewModels.NameReplacementsVM();
         }
     }
 
-    public class NRViewModel
-    {
-        public ObservableCollection<Replacement> Replacements { get; set; }
-
-        public NRViewModel()
-        {
-            Replacements = new ObservableCollection<Replacement>();
-            Replacements.Add(new Replacement("Netto Markendiscount", "Netto"));
-            Replacements.Add(new Replacement("Kaufland GmbH", "Kaufland"));
-            Replacements.Add(new Replacement("Aldi Gmbh und Co", "Aldi"));
-
-        }
-
-    }
-
-    public class Replacement: INotifyPropertyChanged
-    {
-        private string _original;
-        public string Original
-        {
-            get { return _original; }
-            set
-            {
-                if (_original != value)
-                {
-                    _original = value;
-                    RaisePropertyChange();
-                }
-            }
-        }
-
-        private string _replaced;
-        public string Replaced
-        {
-            get { return _replaced; }
-            set
-            {
-                if (_replaced != value)
-                {
-                    _replaced = value;
-                    RaisePropertyChange();
-                }
-            }
-        }
-
-        public Replacement() { }
-
-        public Replacement(string orig, string repl)
-        {
-            Original = orig;
-            Replaced = repl;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void RaisePropertyChange([CallerMemberName] string propertyname = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
-        }
-    }
 }

@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using ExpanseWatcher.ViewModels;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +17,11 @@ namespace ExpanseWatcher
         private const string DEFAULTPATH = "Payments.DB";
 
         /// <summary>
-        /// Adds a <see cref="Share"/> to the database,
-        /// also adds a new <see cref="ShareValue"/> for today to the database.
+        /// Adds a <see cref="Payment"/> to the database,
         /// </summary>
-        /// <param name="share">The <see cref="Share"/> to add.</param>
-        /// <param name="path">The path to the database to insert the <see cref="Share"/>into.</param>
-        /// <returns>1 if successful, 0 if a share matching the ISIN already exists, -1 if an error occured.</returns>
+        /// <param name="payment">The <see cref="Payment"/> to add.</param>
+        /// <param name="path">The path to the database to insert the <see cref="Payment"/>into.</param>
+        /// <returns>1 if successful, -1 if an error occured.</returns>
         public static short AddPaymentToDB(Payment payment, string path = DEFAULTPATH)
         {
             try
@@ -57,6 +57,58 @@ namespace ExpanseWatcher
             catch (Exception ex)
             {
                 Logger.Log("GetPaymentsFromDB : " + ex);
+                return null;
+            }
+        }
+
+        public static short AddReplacementToDB(ReplacementVM replacement, string path = DEFAULTPATH)
+        {
+            try
+            {   // connect to the database
+                using (SQLiteConnection con = new SQLiteConnection(path))
+                {
+                    // get the required tables of the database
+                    con.CreateTable<ReplacementVM>();
+                    var existingReplacement = con.Find<ReplacementVM>(replacement.Original);
+                    if (existingReplacement == null)
+                    {
+                        con.Insert(replacement);
+                    }
+                    else
+                    {
+                        existingReplacement.Replaced = replacement.Replaced;
+                        con.RunInTransaction(() =>
+                        {
+                            con.Update(existingReplacement);
+                        });
+                    }
+
+                }
+
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("AddPaymentToDB : " + ex);
+                return -1;
+            }
+        }
+
+        public static List<ReplacementVM> GetReplacementsFromDB(string path = DEFAULTPATH)
+        {
+            try
+            {   // connect to the database
+                using (SQLiteConnection con = new SQLiteConnection(path))
+                {
+                    // get the required tables of the database
+                    con.CreateTable<ReplacementVM>();
+                    // return the table as list, orderd by the ShareName
+                    return con.Table<ReplacementVM>().ToList().OrderBy((rep) => { return rep.Original; }).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("GetReplacementsFromDB : " + ex);
                 return null;
             }
         }

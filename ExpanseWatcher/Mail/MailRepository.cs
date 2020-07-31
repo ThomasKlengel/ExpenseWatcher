@@ -67,7 +67,7 @@ namespace ExpanseWatcher
         /// <returns></returns>
         public MessageCollection GetMailsSince(string mailBox, DateTime date)
         {
-            var searchPhrase ="SINCE " + date.ToString("dd-MMM-yyyy", new CultureInfo("en-US"));
+            var searchPhrase = "SINCE " + date.ToString("dd-MMM-yyyy", new CultureInfo("en-US"));
 
             return GetMails(mailBox, searchPhrase);
         }
@@ -109,7 +109,9 @@ namespace ExpanseWatcher
         public static void ReadImap()
         {
             var currentPayments = DataBaseHelper.GetPaymentsFromDB();
-            var date = currentPayments.Last().DateOfPayment;
+            DateTimeOffset date = currentPayments?.Last().DateOfPayment != null
+                ? currentPayments.Last().DateOfPayment
+                : new DateTimeOffset(DateTime.Today.AddYears(-10));
 
             GetCredentials(out string user, out string pw);
 
