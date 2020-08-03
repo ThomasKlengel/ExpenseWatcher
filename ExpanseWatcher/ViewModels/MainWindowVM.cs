@@ -17,7 +17,7 @@ namespace ExpanseWatcher.ViewModels
         public MainWindowVM()
         {
             // initial page is overview
-            DisplayPage = new Views.ExpenseOverview();
+            DisplayPage = new Views.ExpenseOverviewPage();
 
             // get payments until now from database
             DataBaseHelper.GetPaymentsFromDB().ForEach(pm => Globals.Payments.Add(pm));
@@ -26,6 +26,10 @@ namespace ExpanseWatcher.ViewModels
             checkMailTimer = new Timer(1000 * 60 * 20);
             checkMailTimer.Elapsed += CheckMailTimer_Elapsed;
             checkMailTimer.Start();
+
+            OverviewCommand = new RelayCommand(ShowOverview);
+            ReplacementsCommand = new RelayCommand(ShowReplacements);
+            CategoriesCommand = new RelayCommand(ShowCategories);
         }
 
         /// <summary>
@@ -37,8 +41,8 @@ namespace ExpanseWatcher.ViewModels
         {
             // read mails in seperate task
             Task.Run(() =>
-            {               
-                MailRepository.ReadImap();                
+            {
+                MailRepository.ReadImap();
             }).Wait();
 
             // refresh payments in view
@@ -48,11 +52,33 @@ namespace ExpanseWatcher.ViewModels
 
         private Timer checkMailTimer;
 
-
+        private Page _displayPage;
         /// <summary>
         /// The page that is currently displayed in the main frame of the main window
         /// </summary>
-        public Page DisplayPage { get; set; }
+        public Page DisplayPage
+        {
+            get
+            {
+                return _displayPage;
+            }
+            set
+            {
+                if (_displayPage!=value)
+                {
+                    _displayPage = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public RelayCommand OverviewCommand { get; private set; }
+        public RelayCommand ReplacementsCommand { get; private set; }
+        public RelayCommand CategoriesCommand { get; private set; }
+
+        private void ShowOverview(object o) { DisplayPage = new Views.ExpenseOverviewPage(); }
+        private void ShowReplacements(object o) { DisplayPage = new Views.NameReplacementsPage(); }
+        private void ShowCategories(object o) { DisplayPage = new Views.CategoriesPage(); }
 
     }
 }

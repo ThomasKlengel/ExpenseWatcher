@@ -4,9 +4,9 @@ namespace ExpanseWatcher.Views
     /// <summary>
     /// Interaktionslogik für NameReplacements.xaml
     /// </summary>
-    public partial class ExpenseOverview : Page
+    public partial class ExpenseOverviewPage : Page
     {
-        public ExpenseOverview()
+        public ExpenseOverviewPage()
         {
             InitializeComponent();
             this.DataContext = Globals.Payments;

@@ -11,6 +11,16 @@
         <vms:MainWindowVM/>
     </Window.DataContext>
     <Grid>
-        <Frame Content="{Binding DisplayPage}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0" VerticalAlignment="Center">
+            <MenuItem Header="Overview" Command="{Binding OverviewCommand}"/>
+            <MenuItem Header="Replacements" Command="{Binding ReplacementsCommand}"/>
+            <MenuItem Header="Categories" Command="{Binding CategoriesCommand}"/>
+        </Menu>
+        <Frame Content="{Binding DisplayPage}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="1"/>
     </Grid>
 </Window>

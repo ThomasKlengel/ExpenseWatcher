@@ -37,6 +37,14 @@ namespace ExpanseWatcher.ViewModels
                     Replacements.Add(rep);
                 }
             }
+            DataBaseHelper.GetPaymentsFromDB().Select(pay => pay.Shop).Distinct().ToList()
+                .ForEach((pm) =>
+                {
+                    if (!Replacements.Any(repl => repl.Original == pm))
+                    {
+                        Replacements.Add(new ReplacementVM(pm, pm));
+                    }
+                });
             ApplyCommand = new RelayCommand(Apply);
 
         }
