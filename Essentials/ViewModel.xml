@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ViewModel</name>
+    </assembly>
+    <members>
+        <member name="T:ViewModel.BaseViewModel">
+            <summary>
+            The basic ViewModel for simplifying the creation of other ViewModels.
+            </summary>
+        </member>
+        <member name="E:ViewModel.BaseViewModel.PropertyChanged">
+            <inheritdoc/>
+        </member>
+        <member name="M:ViewModel.BaseViewModel.NotifyPropertyChanged(System.String)">
+            <summary>
+            Notyfies of changes
+            </summary>
+            <param name="propertyName">The name of the property that changed</param>
+        </member>
+        <member name="E:ViewModel.RelayCommand.CanExecuteChanged">
+            <inheritdoc/>
+        </member>
+        <member name="F:ViewModel.RelayCommand._execute">
+            <summary>
+            Backing field for the action to execute on this command
+            </summary>
+        </member>
+        <member name="F:ViewModel.RelayCommand._canExecute">
+            <summary>
+            Backing field for the precdicate that determines if the action can execute
+            </summary>
+        </member>
+        <member name="M:ViewModel.RelayCommand.#ctor(System.Action{System.Object},System.Predicate{System.Object})">
+            <summary>
+            Creates a new RelayCommand.
+            </summary>
+            <param name="execute">The <see cref="T:System.Action"/> the command should exectute.</param>
+            <param name="canExecute">The <see cref="T:System.Predicate`1"/> to check if the command can be executed.</param>
+        </member>
+        <member name="M:ViewModel.RelayCommand.#ctor(System.Action{System.Object})">
+            <summary>
+            Creates a new RelayCommand that can always execute.
+            </summary>
+            <param name="execute">The <see cref="T:System.Action"/> the command should exectute.</param>
+        </member>
+        <member name="M:ViewModel.RelayCommand.CanExecute(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ViewModel.RelayCommand.Execute(System.Object)">
+            <inheritdoc/>
+        </member>
+    </members>
+</doc>

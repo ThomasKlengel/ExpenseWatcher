@@ -17,7 +17,7 @@ namespace ExpanseWatcher.ViewModels
                 if (_original != value)
                 {
                     _original = value;
-                    OnPropertyChanged();
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -31,7 +31,7 @@ namespace ExpanseWatcher.ViewModels
                 if (_replaced != value)
                 {
                     _replaced = value;
-                    OnPropertyChanged();
+                    NotifyPropertyChanged();
                 }
             }
         }
