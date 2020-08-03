@@ -7,7 +7,7 @@ using System.Linq;
 namespace ExpanseWatcher
 {
     /// <summary>
-    /// A helper class for database handling.
+    /// A helper class for SQlite database handling.
     /// </summary>
     public static class DataBaseHelper
     {
@@ -42,6 +42,11 @@ namespace ExpanseWatcher
             }
         }
 
+        /// <summary>
+        /// Gets all paments from the databse
+        /// </summary>
+        /// <param name="path">The path to the database</param>
+        /// <returns></returns>
         public static List<Payment> GetPaymentsFromDB(string path = DEFAULTPATH)
         {
             try
@@ -61,6 +66,12 @@ namespace ExpanseWatcher
             }
         }
 
+        /// <summary>
+        /// Adds a replacement to the database
+        /// </summary>
+        /// <param name="replacement">The <see cref="ReplacementVM"/> to add to the database</param>
+        /// <param name="path">The path to the database</param>
+        /// <returns></returns>
         public static short AddReplacementToDB(ReplacementVM replacement, string path = DEFAULTPATH)
         {
             try
@@ -94,6 +105,11 @@ namespace ExpanseWatcher
             }
         }
 
+        /// <summary>
+        /// Gets all replacements from the database
+        /// </summary>
+        /// <param name="path">The path to the database</param>
+        /// <returns></returns>
         public static List<ReplacementVM> GetReplacementsFromDB(string path = DEFAULTPATH)
         {
             try

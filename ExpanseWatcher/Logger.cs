@@ -4,6 +4,9 @@ using System.IO;
 
 namespace ExpanseWatcher
 {
+    /// <summary>
+    /// class reperesenting a logger 
+    /// </summary>
     public static class Logger
     {
         /// <summary>
