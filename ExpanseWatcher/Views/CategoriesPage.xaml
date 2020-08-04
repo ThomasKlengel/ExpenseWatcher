@@ -22,17 +22,23 @@
             <ColumnDefinition Width="100"/>
             <ColumnDefinition Width="200"/>
         </Grid.ColumnDefinitions>
-        <ComboBox ItemsSource="{Binding Categories}" Grid.Row="0" Grid.ColumnSpan="3" Margin="5" 
-                  SelectedValue="{Binding SelectedCategory, Mode=TwoWay}"/>
+        <ComboBox ItemsSource="{Binding Categories}" Grid.Row="0" Grid.ColumnSpan="3" Margin="5"
+                  SelectedValue="{Binding SelectedCategory, Mode=TwoWay}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Path=Name}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
         <TextBox Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding NewCategory}"/>
         <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal">
             <Button Width="100" Command="{Binding AddCategoryCommand}">Add</Button>
             <Button Width="100" Command="{Binding RemoveCategoryCommand}">Remove</Button>
         </StackPanel>
         <ListBox Width="200" HorizontalAlignment="Left" ItemsSource="{Binding UnassignedItems}" Grid.Row="2" Grid.Column="0" Height="250"
-                 SelectedValue="{Binding UnassigedItem, Mode=TwoWay}" SelectedIndex="{Binding SelectedIndex}"/>
-        <ListBox Width="200" HorizontalAlignment="Left" ItemsSource="{Binding AssignedItems}" Grid.Row="2" Grid.Column="2"
-                 SelectedValue="{Binding AssigedItem}" />
+                 SelectedValue="{Binding SelectedUnassigned}" />
+        <ListBox Width="200" HorizontalAlignment="Left" ItemsSource="{Binding Path=SelectedCategory.AttachedShops}" Grid.Row="2" Grid.Column="2"
+                 SelectedValue="{Binding SelectedAssigned}"/>
         <Grid Grid.Column="1" Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>

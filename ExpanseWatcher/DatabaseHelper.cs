@@ -129,5 +129,71 @@ namespace ExpanseWatcher
             }
         }
 
+        /// <summary>
+        /// Adds a item to the database
+        /// </summary>
+        /// <param name="item">The <see cref="ReplacementVM"/> to add to the database</param>
+        /// <param name="path">The path to the database</param>
+        /// <returns></returns>
+        public static short AddItemsToDB(Shop item, string path = DEFAULTPATH)
+        {
+            //TODO: implement
+            return - 1;
+            try
+            {   // connect to the database
+                using (SQLiteConnection con = new SQLiteConnection(path))
+                {
+                    // get the required tables of the database
+                    con.CreateTable<Shop>();
+                    var existingItem = con.Find<Shop>(item.Index);
+                    if (existingItem == null)
+                    {
+                        con.Insert(item);
+                    }
+                    else
+                    {
+                        existingItem.Name = item.Name;
+                        con.RunInTransaction(() =>
+                        {
+                            con.Update(existingItem);
+                        });
+                    }
+
+                }
+
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("AddPaymentToDB : " + ex);
+                return -1;
+            }
+        }
+
+        /// <summary>
+        /// Gets all replacements from the database
+        /// </summary>
+        /// <param name="path">The path to the database</param>
+        /// <returns></returns>
+        public static List<Shop> GetItemsFromDB(string path = DEFAULTPATH)
+        {
+            //TODO: implement
+            return null;
+            try
+            {   // connect to the database
+                using (SQLiteConnection con = new SQLiteConnection(path))
+                {
+                    // get the required tables of the database
+                    con.CreateTable<ReplacementVM>();
+                    // return the table as list, orderd by the ShareName
+                    //return con.Table<ReplacementVM>().ToList().OrderBy((rep) => { return rep.Original; }).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("GetReplacementsFromDB : " + ex);
+                return null;
+            }
+        }
     }
 }

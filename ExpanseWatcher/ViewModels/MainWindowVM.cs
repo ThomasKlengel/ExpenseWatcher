@@ -22,6 +22,27 @@ namespace ExpanseWatcher.ViewModels
             // get payments until now from database
             DataBaseHelper.GetPaymentsFromDB().ForEach(pm => Globals.Payments.Add(pm));
 
+            // get replacements until now from database
+            DataBaseHelper.GetReplacementsFromDB().ForEach(rep => Globals.Replacements.Add(rep));
+
+            foreach (var payment in Globals.Payments)
+            {
+                if (!Globals.Shops.Any(s=>s.Name==payment.Shop))
+                {
+                    Globals.Shops.Add(new Shop(payment.Shop));
+                }
+            }
+
+            foreach(var rep in Globals.Replacements)
+            {
+                var shop = Globals.Shops.Find(s => s.Name == rep.Original);
+                if (shop!=null)
+                {
+                    Globals.Shops.Remove(shop);
+                    Globals.Shops.Add(new Shop(rep.Replaced));
+                }
+            }            
+
             // initialize update timer
             checkMailTimer = new Timer(1000 * 60 * 20);
             checkMailTimer.Elapsed += CheckMailTimer_Elapsed;

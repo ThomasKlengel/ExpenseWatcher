@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using ViewModel;
 
@@ -6,21 +7,27 @@ namespace ExpanseWatcher.ViewModels
 {
     public class CategoriesPageVM : BaseViewModel
     {
+        private Dictionary<string, List<int>> AllCategories;
+
         public CategoriesPageVM()
         {
-            AssignedItems = new ObservableCollection<string>() { "Assigned1", "Assigned2", "Assigned3" };
-            UnassignedItems = new ObservableCollection<string>() { "unAssigned1", "unAssigned2", "unAssigned3" };
-            Categories = new ObservableCollection<string>() { "Cat1", "Cat2", "Cat3" };
 
             AssignItemCommand = new RelayCommand(AssignItem, CanAssignItem);
             UnassignItemCommand = new RelayCommand(UnassignItem, CanUnassignItem);
             AddCategoryCommand = new RelayCommand(AddCategory, CanAddCategory);
             RemoveCategoryCommand = new RelayCommand(RemoveCategory, CanRemoveCategory);
+
+            Categories = Globals.Categories;
+            Globals.Shops.ForEach(s=> UnassignedItems.Add(s.Name));
         }
 
-        public ObservableCollection<string> Categories { get; set; } = new ObservableCollection<string>();
-        private string _selectedCategory;
-        public string SelectedCategory
+        public ObservableCollection<Category> Categories { get; set; } = new ObservableCollection<Category>();
+
+        private Category _selectedCategory;
+        /// <summary>
+        /// The category that is currently selected
+        /// </summary>
+        public Category SelectedCategory
         {
             get
             {
@@ -31,7 +38,7 @@ namespace ExpanseWatcher.ViewModels
                 if (_selectedCategory != value)
                 {
                     _selectedCategory = value;
-                    _newCategory = value;
+                    _newCategory = _selectedCategory.Name;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged(nameof(NewCategory));
                 }
@@ -39,6 +46,9 @@ namespace ExpanseWatcher.ViewModels
         }
 
         private string _newCategory;
+        /// <summary>
+        /// A new category that can be added
+        /// </summary>
         public string NewCategory
         {
             get
@@ -56,85 +66,179 @@ namespace ExpanseWatcher.ViewModels
 
         }
 
-        public ObservableCollection<string> AssignedItems { get; set; } = new ObservableCollection<string>();
-        private int _selectedIndexAssigned;
-        public int SelectedIndexAssigned
+        /// <summary>
+        /// Items assigned to this category
+        /// </summary>
+        public ObservableCollection<string> AssignedItems
         {
             get
             {
-                return _selectedIndexAssigned;
-            }
-            set
-            {
-                if (_selectedIndexAssigned != value)
+                var coll = new ObservableCollection<string>();
+                if (SelectedCategory!=null)
                 {
-                    _selectedIndexAssigned = value;
-                    NotifyPropertyChanged();
+                    //var cat = Categories.FirstOrDefault(c => c.Name == SelectedCategory);
+                    foreach (var item in SelectedCategory.AttachedShops)
+                    {
+                        coll.Add(item);
+                    }
                 }
+                return coll;
             }
         }
 
+        public string _selectedAssigned;
+        public string SelectedAssigned
+        {
+            get
+            {
+                return _selectedAssigned;
+            }
+            set{
+                if (_selectedAssigned != value)
+                {
+                    _selectedAssigned = value;
+                    NotifyPropertyChanged();
+                }
+
+            }
+        }
+
+        public string _selectedUnassigned;
+        public string SelectedUnassigned
+        {
+            get
+            {
+                return _selectedUnassigned;
+            }
+            set
+            {
+                if (_selectedUnassigned != value)
+                {
+                    _selectedUnassigned = value;
+                    NotifyPropertyChanged();
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// items that are not assigned to any category
+        /// </summary>
         public ObservableCollection<string> UnassignedItems { get; set; } = new ObservableCollection<string>();
-        private int _selectedIndexUnassigned;
-        public int SelectedIndexUnassigned
-        {
-            get
-            {
-                return _selectedIndexUnassigned;
-            }
-            set
-            {
-                if (_selectedIndexUnassigned != value)
-                {
-                    _selectedIndexUnassigned = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
 
+        #region Add Category Command
+        /// <summary>
+        /// Command that handles adding of new categories to a list
+        /// </summary>
         public RelayCommand AddCategoryCommand { get; private set; }
-        public RelayCommand RemoveCategoryCommand { get; private set; }
-        public RelayCommand AssignItemCommand { get; private set; }
-        public RelayCommand UnassignItemCommand { get; private set; }
 
-        public void AssignItem(object o)
+        /// <summary>
+        /// Adds a category to the list of categories
+        /// </summary>
+        /// <param name="o"></param>
+        public void AddCategory(object o)
         {
-            AssignedItems.Add(UnassignedItems.ElementAt(SelectedIndexUnassigned));
-            UnassignedItems.RemoveAt(SelectedIndexUnassigned);
-            SelectedIndexUnassigned = 0;
+            Globals.Categories.Add(new Category(NewCategory, new List<string>()));
         }
-        public bool CanAssignItem(object o)
-        {
-            return UnassignedItems.Count > 0;
-        }
-
-        public void UnassignItem(object o)
-        {
-            UnassignedItems.Add(AssignedItems.ElementAt(SelectedIndexAssigned));
-            AssignedItems.RemoveAt(SelectedIndexAssigned);
-            SelectedIndexAssigned = 0;
-        }
-        public bool CanUnassignItem(object o)
-        {
-            return AssignedItems.Count > 0;
-        }
-
-        public void AddCategory (object o)
-        {
-                Categories.Add(NewCategory);            
-        }
+        /// <summary>
+        /// Defines if a categrory can be added
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns>true if this category does not already exist in the list</returns>
         public bool CanAddCategory(object o)
         {
-            return !Categories.Contains(NewCategory);
+            return !Globals.Categories.Any(cat => cat.Name == NewCategory);
         }
+        #endregion
 
+        #region Remove Category Command
+        /// <summary>
+        /// Command that handles removing of caregories from a list
+        /// </summary>
+        public RelayCommand RemoveCategoryCommand { get; private set; }
+
+        /// <summary>
+        /// Removes a category from the list of categories
+        /// </summary>
+        /// <param name="o"></param>
         public void RemoveCategory(object o)
         {
-            Categories.Remove(NewCategory);
+            var cat = Globals.Categories.FirstOrDefault(c => c.Name == NewCategory);
+            Globals.Categories.Remove(cat);
         }
+        /// <summary>
+        /// Defines if a categrory can be added
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns>true if the category exists in the list</returns>
         public bool CanRemoveCategory(object o)
         {
-            return Categories.Contains(NewCategory);
+            return Globals.Categories.Any(cat => cat.Name == NewCategory);
         }
+        #endregion
+
+        #region Assign Item Command
+        /// <summary>
+        /// Command that handles assignment of items to a category
+        /// </summary>
+        public RelayCommand AssignItemCommand { get; private set; }
+
+        /// <summary>
+        /// Adds an itemto a category
+        /// </summary>
+        /// <param name="o"></param>
+        public void AssignItem(object o)
+        {
+            // add item to assigned items
+            SelectedCategory.AttachedShops.Add(SelectedUnassigned);
+            // remove from unassigned
+            UnassignedItems.Remove(SelectedUnassigned);
+        }
+        /// <summary>
+        /// Defines if an item can be assigned
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns>true if there are any unassigned items</returns>
+        public bool CanAssignItem(object o)
+        {
+            return SelectedUnassigned != null && SelectedCategory != null;
+        }
+
+        #endregion
+
+        #region Unassign Item Command
+        /// <summary>
+        /// Command that handles removal of items from a category
+        /// </summary>
+        public RelayCommand UnassignItemCommand { get; private set; }
+
+        /// <summary>
+        /// removes an item from a category
+        /// </summary>
+        /// <param name="o"></param>
+        public void UnassignItem(object o)
+        {
+            // add item to unassigned
+            UnassignedItems.Add(SelectedAssigned);
+            //remove item from assigned
+            SelectedCategory.AttachedShops.Remove(SelectedAssigned);
+            var ordered = UnassignedItems.OrderBy(ord => ord).ToList();
+            UnassignedItems.Clear();
+            foreach (var item in ordered)
+            {
+                UnassignedItems.Add(item);
+            }
+        }
+        /// <summary>
+        /// Defines if an item can be unassigned
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns>true if there is any assigned item</returns>
+        public bool CanUnassignItem(object o)
+        {
+            return SelectedAssigned != null && SelectedCategory != null;
+        }
+        #endregion
+
     }
 }
