@@ -32,6 +32,13 @@ namespace ExpanseWatcher
             {
                 return JsonConvert.SerializeObject(AttachedShops);
             }
+            set
+            {
+                if (value != null)
+                {
+                    AttachedShops = JsonConvert.DeserializeObject<ObservableCollection<string>>(value);
+                }
+            }
         }
         #endregion
 

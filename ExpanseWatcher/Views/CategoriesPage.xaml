@@ -16,6 +16,7 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
@@ -35,7 +36,7 @@
             <Button Width="100" Command="{Binding AddCategoryCommand}">Add</Button>
             <Button Width="100" Command="{Binding RemoveCategoryCommand}">Remove</Button>
         </StackPanel>
-        <ListBox Width="200" HorizontalAlignment="Left" ItemsSource="{Binding UnassignedItems}" Grid.Row="2" Grid.Column="0" Height="250"
+        <ListBox Width="200" HorizontalAlignment="Left" ItemsSource="{Binding UnassignedShops}" Grid.Row="2" Grid.Column="0" Height="250"
                  SelectedValue="{Binding SelectedUnassigned}" />
         <ListBox Width="200" HorizontalAlignment="Left" ItemsSource="{Binding Path=SelectedCategory.AttachedShops}" Grid.Row="2" Grid.Column="2"
                  SelectedValue="{Binding SelectedAssigned}"/>
@@ -49,5 +50,6 @@
             <Button Grid.Row="1" Margin="5" VerticalAlignment="Top" Content="Assign" Command="{Binding AssignItemCommand}"/>
             <Button Grid.Row="2" Margin="5" VerticalAlignment="Top" Content="Unassign" Command="{Binding UnassignItemCommand}"/>
         </Grid>
+        <Button Grid.Row="3" Command="{Binding SaveCategoriesCommand}">Apply</Button>
     </Grid>
 </Page>

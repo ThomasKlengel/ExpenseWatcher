@@ -130,32 +130,59 @@ namespace ExpanseWatcher
         }
 
         /// <summary>
-        /// Adds a item to the database
+        /// Adds a category to the database
         /// </summary>
-        /// <param name="item">The <see cref="ReplacementVM"/> to add to the database</param>
+        /// <param name="item">The <see cref="Category"/> to add to the database</param>
         /// <param name="path">The path to the database</param>
         /// <returns></returns>
-        public static short AddItemsToDB(Shop item, string path = DEFAULTPATH)
+        public static short SaveCategoriesToDB(string path = DEFAULTPATH)
         {
-            //TODO: implement
-            return - 1;
+            try
+            {   // connect to the database
+                using (SQLiteConnection con = new SQLiteConnection(path))
+                {
+                    // get the required tables of the database                    
+                    con.DropTable<Category>();
+                }
+                foreach (var cat in Globals.Categories)
+                {
+                    AddCategoryToDB(cat);
+                }
+
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("AddPaymentToDB : " + ex);
+                return -1;
+            }
+        }
+
+        /// <summary>
+        /// Adds a category to the database
+        /// </summary>
+        /// <param name="item">The <see cref="Category"/> to add to the database</param>
+        /// <param name="path">The path to the database</param>
+        /// <returns></returns>
+        public static short AddCategoryToDB(Category category, string path = DEFAULTPATH)
+        {
             try
             {   // connect to the database
                 using (SQLiteConnection con = new SQLiteConnection(path))
                 {
                     // get the required tables of the database
-                    con.CreateTable<Shop>();
-                    var existingItem = con.Find<Shop>(item.Index);
-                    if (existingItem == null)
+                    con.CreateTable<Category>();
+                    var existingCategory = con.Find<Category>(category.Name);
+                    if (existingCategory == null)
                     {
-                        con.Insert(item);
+                        con.Insert(category);
                     }
                     else
                     {
-                        existingItem.Name = item.Name;
+                        existingCategory = category;
                         con.RunInTransaction(() =>
                         {
-                            con.Update(existingItem);
+                            con.Update(existingCategory);
                         });
                     }
 
@@ -175,18 +202,16 @@ namespace ExpanseWatcher
         /// </summary>
         /// <param name="path">The path to the database</param>
         /// <returns></returns>
-        public static List<Shop> GetItemsFromDB(string path = DEFAULTPATH)
-        {
-            //TODO: implement
-            return null;
+        public static List<Category> GetCategoriesFromDB(string path = DEFAULTPATH)
+        { 
             try
             {   // connect to the database
                 using (SQLiteConnection con = new SQLiteConnection(path))
                 {
                     // get the required tables of the database
-                    con.CreateTable<ReplacementVM>();
+                    con.CreateTable<Category>();
                     // return the table as list, orderd by the ShareName
-                    //return con.Table<ReplacementVM>().ToList().OrderBy((rep) => { return rep.Original; }).ToList();
+                    return con.Table<Category>().ToList().OrderBy(cat => cat.Name).ToList();
                 }
             }
             catch (Exception ex)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,11 +12,13 @@ namespace ExpanseWatcher.ViewModels
 {
     class MainWindowVM : BaseViewModel
     {
+        MailClient _mailClient=new MailClient();
         /// <summary>
         /// Constructor
         /// </summary>
         public MainWindowVM()
         {
+            _mailClient.MailFinished += _mailClient_MailFinished;
             // initial page is overview
             DisplayPage = new Views.ExpenseOverviewPage();
 
@@ -25,23 +28,8 @@ namespace ExpanseWatcher.ViewModels
             // get replacements until now from database
             DataBaseHelper.GetReplacementsFromDB().ForEach(rep => Globals.Replacements.Add(rep));
 
-            foreach (var payment in Globals.Payments)
-            {
-                if (!Globals.Shops.Any(s=>s.Name==payment.Shop))
-                {
-                    Globals.Shops.Add(new Shop(payment.Shop));
-                }
-            }
-
-            foreach(var rep in Globals.Replacements)
-            {
-                var shop = Globals.Shops.Find(s => s.Name == rep.Original);
-                if (shop!=null)
-                {
-                    Globals.Shops.Remove(shop);
-                    Globals.Shops.Add(new Shop(rep.Replaced));
-                }
-            }            
+            // get categories until now from database
+            DataBaseHelper.GetCategoriesFromDB().ForEach(cat => Globals.Categories.Add(cat));
 
             // initialize update timer
             checkMailTimer = new Timer(1000 * 60 * 20);
@@ -51,6 +39,11 @@ namespace ExpanseWatcher.ViewModels
             OverviewCommand = new RelayCommand(ShowOverview);
             ReplacementsCommand = new RelayCommand(ShowReplacements);
             CategoriesCommand = new RelayCommand(ShowCategories);
+
+            Task.Run(() =>
+            {
+                _mailClient.ReadImap();
+            });
         }
 
         /// <summary>
@@ -63,12 +56,21 @@ namespace ExpanseWatcher.ViewModels
             // read mails in seperate task
             Task.Run(() =>
             {
-                MailRepository.ReadImap();
-            }).Wait();
+                _mailClient.ReadImap();
+            });                       
+        }
 
+        private void _mailClient_MailFinished()
+        {
             // refresh payments in view
-            Globals.Payments.Clear();
-            DataBaseHelper.GetPaymentsFromDB().ForEach(pm => Globals.Payments.Add(pm));
+            App.Current.Dispatcher.Invoke(()=> 
+            {
+                Globals.Payments.Clear();
+                // get payments until now from database
+                DataBaseHelper.GetPaymentsFromDB().ForEach(pm => Globals.Payments.Add(pm));
+
+            });
+            
         }
 
         private Timer checkMailTimer;

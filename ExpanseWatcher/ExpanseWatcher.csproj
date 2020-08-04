@@ -124,6 +124,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Globals.cs" />
+    <Compile Include="Mail\MailClient.cs" />
     <Compile Include="Shop.cs" />
     <Compile Include="ViewModels\CategoriesPageVM.cs" />
     <Compile Include="ViewModels\MainWindowVM.cs" />

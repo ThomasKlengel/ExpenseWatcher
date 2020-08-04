@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using ViewModel;
 
 namespace ExpanseWatcher.ViewModels
 {
     public class CategoriesPageVM : BaseViewModel
     {
-        private Dictionary<string, List<int>> AllCategories;
-
         public CategoriesPageVM()
         {
 
@@ -16,12 +15,43 @@ namespace ExpanseWatcher.ViewModels
             UnassignItemCommand = new RelayCommand(UnassignItem, CanUnassignItem);
             AddCategoryCommand = new RelayCommand(AddCategory, CanAddCategory);
             RemoveCategoryCommand = new RelayCommand(RemoveCategory, CanRemoveCategory);
+            SaveCategoriesCommand = new RelayCommand(SaveCategory);
 
             Categories = Globals.Categories;
-            Globals.Shops.ForEach(s=> UnassignedItems.Add(s.Name));
+
         }
 
         public ObservableCollection<Category> Categories { get; set; } = new ObservableCollection<Category>();
+
+        public ObservableCollection<string> UnassignedShops
+        {
+            get
+            {
+                var unassignedShops = new HashSet<string>();
+                foreach (var pay in Globals.Payments)
+                {
+                    unassignedShops.Add(pay.Shop);
+                }
+                foreach (var cat in Categories)
+                {
+                    foreach (var shop in cat.AttachedShops)
+                    {
+                        if (unassignedShops.Contains(shop))
+                        {
+                            unassignedShops.Remove(shop);
+                        }
+                    }
+                }
+                unassignedShops = unassignedShops.OrderBy(o => o).ToHashSet();
+                var obs = new ObservableCollection<string>();
+                foreach (var shop in unassignedShops)
+                {
+                    obs.Add(shop);
+                }
+
+                return obs;
+            }
+        }
 
         private Category _selectedCategory;
         /// <summary>
@@ -38,10 +68,11 @@ namespace ExpanseWatcher.ViewModels
                 if (_selectedCategory != value)
                 {
                     _selectedCategory = value;
-                    _newCategory = _selectedCategory.Name;
+                    _newCategory = _selectedCategory?.Name;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged(nameof(NewCategory));
                 }
+
             }
         }
 
@@ -74,7 +105,7 @@ namespace ExpanseWatcher.ViewModels
             get
             {
                 var coll = new ObservableCollection<string>();
-                if (SelectedCategory!=null)
+                if (SelectedCategory != null)
                 {
                     //var cat = Categories.FirstOrDefault(c => c.Name == SelectedCategory);
                     foreach (var item in SelectedCategory.AttachedShops)
@@ -93,7 +124,8 @@ namespace ExpanseWatcher.ViewModels
             {
                 return _selectedAssigned;
             }
-            set{
+            set
+            {
                 if (_selectedAssigned != value)
                 {
                     _selectedAssigned = value;
@@ -121,11 +153,6 @@ namespace ExpanseWatcher.ViewModels
             }
         }
 
-        /// <summary>
-        /// items that are not assigned to any category
-        /// </summary>
-        public ObservableCollection<string> UnassignedItems { get; set; } = new ObservableCollection<string>();
-
         #region Add Category Command
         /// <summary>
         /// Command that handles adding of new categories to a list
@@ -139,6 +166,7 @@ namespace ExpanseWatcher.ViewModels
         public void AddCategory(object o)
         {
             Globals.Categories.Add(new Category(NewCategory, new List<string>()));
+            SelectedCategory = Globals.Categories.FirstOrDefault(cat => cat.Name == NewCategory);
         }
         /// <summary>
         /// Defines if a categrory can be added
@@ -147,7 +175,7 @@ namespace ExpanseWatcher.ViewModels
         /// <returns>true if this category does not already exist in the list</returns>
         public bool CanAddCategory(object o)
         {
-            return !Globals.Categories.Any(cat => cat.Name == NewCategory);
+            return !string.IsNullOrEmpty(NewCategory?.Trim()) && !Globals.Categories.Any(cat => cat.Name == NewCategory);
         }
         #endregion
 
@@ -165,6 +193,9 @@ namespace ExpanseWatcher.ViewModels
         {
             var cat = Globals.Categories.FirstOrDefault(c => c.Name == NewCategory);
             Globals.Categories.Remove(cat);
+            NewCategory = null;
+            NotifyPropertyChanged(nameof(UnassignedShops));
+            SelectedCategory = Categories.FirstOrDefault();
         }
         /// <summary>
         /// Defines if a categrory can be added
@@ -175,6 +206,26 @@ namespace ExpanseWatcher.ViewModels
         {
             return Globals.Categories.Any(cat => cat.Name == NewCategory);
         }
+        #endregion
+
+        #region Save Categories Command
+        /// <summary>
+        /// Command that handles adding of new categories to a list
+        /// </summary>
+        public RelayCommand SaveCategoriesCommand { get; private set; }
+
+        /// <summary>
+        /// Adds a category to the list of categories
+        /// </summary>
+        /// <param name="o"></param>
+        public void SaveCategory(object o)
+        {
+            Task.Run(() =>
+            {
+                DataBaseHelper.SaveCategoriesToDB();
+            });
+        }
+
         #endregion
 
         #region Assign Item Command
@@ -192,7 +243,8 @@ namespace ExpanseWatcher.ViewModels
             // add item to assigned items
             SelectedCategory.AttachedShops.Add(SelectedUnassigned);
             // remove from unassigned
-            UnassignedItems.Remove(SelectedUnassigned);
+            NotifyPropertyChanged(nameof(UnassignedShops));
+            SelectedUnassigned = UnassignedShops.FirstOrDefault();
         }
         /// <summary>
         /// Defines if an item can be assigned
@@ -219,15 +271,10 @@ namespace ExpanseWatcher.ViewModels
         public void UnassignItem(object o)
         {
             // add item to unassigned
-            UnassignedItems.Add(SelectedAssigned);
             //remove item from assigned
             SelectedCategory.AttachedShops.Remove(SelectedAssigned);
-            var ordered = UnassignedItems.OrderBy(ord => ord).ToList();
-            UnassignedItems.Clear();
-            foreach (var item in ordered)
-            {
-                UnassignedItems.Add(item);
-            }
+            SelectedAssigned = SelectedCategory.AttachedShops.FirstOrDefault();
+            NotifyPropertyChanged(nameof(UnassignedShops));
         }
         /// <summary>
         /// Defines if an item can be unassigned
