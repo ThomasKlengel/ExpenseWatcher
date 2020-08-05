@@ -15,7 +15,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -23,23 +23,27 @@
             <ColumnDefinition Width="100"/>
             <ColumnDefinition Width="200"/>
         </Grid.ColumnDefinitions>
-        <ComboBox ItemsSource="{Binding Categories}" Grid.Row="0" Grid.ColumnSpan="3" Margin="5"
-                  SelectedValue="{Binding SelectedCategory, Mode=TwoWay}">
+        <ComboBox ItemsSource="{Binding Categories}" SelectedValue="{Binding SelectedCategory, Mode=TwoWay}"
+                  Grid.Row="0" Grid.ColumnSpan="3" Margin="2" >
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Path=Name}"/>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <TextBox Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding NewCategory}"/>
-        <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal">
-            <Button Width="100" Command="{Binding AddCategoryCommand}">Add</Button>
-            <Button Width="100" Command="{Binding RemoveCategoryCommand}">Remove</Button>
-        </StackPanel>
-        <ListBox Width="200" HorizontalAlignment="Left" ItemsSource="{Binding UnassignedShops}" Grid.Row="2" Grid.Column="0" Height="250"
-                 SelectedValue="{Binding SelectedUnassigned}" />
-        <ListBox Width="200" HorizontalAlignment="Left" ItemsSource="{Binding Path=SelectedCategory.AttachedShops}" Grid.Row="2" Grid.Column="2"
-                 SelectedValue="{Binding SelectedAssigned}"/>
+        <TextBox Text="{Binding NewCategory}" Grid.Row="1" Grid.ColumnSpan="2" Margin="2"/>
+        <Grid Grid.Row="1" Grid.Column="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Command="{Binding AddCategoryCommand}" Grid.Column="0" Margin="2">Add</Button>
+            <Button Command="{Binding RemoveCategoryCommand}" Grid.Column="1" Margin="2">Remove</Button>
+        </Grid>
+        <ListBox ItemsSource="{Binding UnassignedShops}" SelectedValue="{Binding SelectedUnassigned}"
+                 Grid.Row="2" Grid.Column="0" Margin="2" />
+        <ListBox ItemsSource="{Binding Path=SelectedCategory.AttachedShops}" SelectedValue="{Binding SelectedAssigned}"
+                 Grid.Row="2" Grid.Column="2" Margin="2" />
         <Grid Grid.Column="1" Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -47,9 +51,8 @@
                 <RowDefinition Height="60"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Button Grid.Row="1" Margin="5" VerticalAlignment="Top" Content="Assign" Command="{Binding AssignItemCommand}"/>
+            <Button Grid.Row="1" Margin="5" VerticalAlignment="Bottom" Content="Assign" Command="{Binding AssignItemCommand}"/>
             <Button Grid.Row="2" Margin="5" VerticalAlignment="Top" Content="Unassign" Command="{Binding UnassignItemCommand}"/>
         </Grid>
-        <Button Grid.Row="3" Command="{Binding SaveCategoriesCommand}">Apply</Button>
     </Grid>
 </Page>

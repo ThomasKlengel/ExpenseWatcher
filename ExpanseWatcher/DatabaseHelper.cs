@@ -105,6 +105,30 @@ namespace ExpanseWatcher
             }
         }
 
+        public static short SaveReplacementsToDB(string path=DEFAULTPATH)
+        {
+            try
+            {   // connect to the database
+                using (SQLiteConnection con = new SQLiteConnection(path))
+                {
+                    // get the required tables of the database                    
+                    con.DropTable<ReplacementVM>();
+                }
+                foreach (var rep in Globals.Replacements)
+                {
+                    AddReplacementToDB(rep);
+                }
+
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("AddPaymentToDB : " + ex);
+                return -1;
+            }
+
+        }
+
         /// <summary>
         /// Gets all replacements from the database
         /// </summary>

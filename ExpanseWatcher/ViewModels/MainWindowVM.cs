@@ -68,7 +68,6 @@ namespace ExpanseWatcher.ViewModels
                 Globals.Payments.Clear();
                 // get payments until now from database
                 DataBaseHelper.GetPaymentsFromDB().ForEach(pm => Globals.Payments.Add(pm));
-
             });
             
         }
@@ -99,9 +98,17 @@ namespace ExpanseWatcher.ViewModels
         public RelayCommand ReplacementsCommand { get; private set; }
         public RelayCommand CategoriesCommand { get; private set; }
 
-        private void ShowOverview(object o) { DisplayPage = new Views.ExpenseOverviewPage(); }
-        private void ShowReplacements(object o) { DisplayPage = new Views.NameReplacementsPage(); }
-        private void ShowCategories(object o) { DisplayPage = new Views.CategoriesPage(); }
-
+        private void ShowOverview(object o) { DisplayPage = new Views.ExpenseOverviewPage(); Save(); }
+        private void ShowReplacements(object o) { DisplayPage = new Views.NameReplacementsPage(); Save(); }
+        private void ShowCategories(object o) { DisplayPage = new Views.CategoriesPage(); Save(); }
+        
+        private void Save ()
+        {
+            Task.Run(() =>
+            {
+                DataBaseHelper.SaveReplacementsToDB();
+                DataBaseHelper.SaveCategoriesToDB();
+            });
+        }
     }
 }
