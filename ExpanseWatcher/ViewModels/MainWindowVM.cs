@@ -39,6 +39,7 @@ namespace ExpanseWatcher.ViewModels
             OverviewCommand = new RelayCommand(ShowOverview);
             ReplacementsCommand = new RelayCommand(ShowReplacements);
             CategoriesCommand = new RelayCommand(ShowCategories);
+            ChartsCommand = new RelayCommand(ShowCharts);
 
             Task.Run(() =>
             {
@@ -97,11 +98,13 @@ namespace ExpanseWatcher.ViewModels
         public RelayCommand OverviewCommand { get; private set; }
         public RelayCommand ReplacementsCommand { get; private set; }
         public RelayCommand CategoriesCommand { get; private set; }
+        public RelayCommand ChartsCommand { get; private set; }
 
         private void ShowOverview(object o) { DisplayPage = new Views.ExpenseOverviewPage(); Save(); }
         private void ShowReplacements(object o) { DisplayPage = new Views.NameReplacementsPage(); Save(); }
         private void ShowCategories(object o) { DisplayPage = new Views.CategoriesPage(); Save(); }
-        
+        private void ShowCharts(object o) { DisplayPage = new Views.ChartsPage(); Save(); }
+
         private void Save ()
         {
             Task.Run(() =>
