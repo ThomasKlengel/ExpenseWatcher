@@ -13,19 +13,6 @@
         <view:ChartsPageVM/>
     </Page.DataContext>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <lvc:PieChart LegendLocation="Bottom" Hoverable="False"  Grid.Column="0">
-            <lvc:PieChart.Series>
-                <lvc:PieSeries Title="Charles" Values="4" DataLabels="True" />
-                <lvc:PieSeries Title="Frida" Values="6" DataLabels="True" />
-            </lvc:PieChart.Series>
-        </lvc:PieChart>
-
-        <lvc:PieChart LegendLocation="Bottom" Hoverable="False"  Grid.Column="1" Series="{Binding Series}">
-
-        </lvc:PieChart>
+        <lvc:PieChart LegendLocation="Bottom" Hoverable="False"  Grid.Column="1" Series="{Binding Series}"/>
     </Grid>
 </Page>
