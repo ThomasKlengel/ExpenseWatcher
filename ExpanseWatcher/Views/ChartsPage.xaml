@@ -13,6 +13,11 @@
         <view:ChartsPageVM/>
     </Page.DataContext>
     <Grid>
-        <lvc:PieChart LegendLocation="Bottom" Hoverable="False"  Grid.Column="1" Series="{Binding Series}"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="400"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <lvc:PieChart LegendLocation="Bottom" Hoverable="False"  Grid.Column="0" Series="{Binding Series}"/>
+        <lvc:CartesianChart LegendLocation="Bottom" Hoverable="False"  Grid.Column="1" Series="{Binding Series2}"/>
     </Grid>
 </Page>
