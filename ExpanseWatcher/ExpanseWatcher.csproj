@@ -129,6 +129,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Setting.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="Mail\MailClient.cs" />
     <Compile Include="Shop.cs" />
@@ -148,6 +149,9 @@
     </Compile>
     <Compile Include="Views\NameReplacements.xaml.cs">
       <DependentUpon>NameReplacements.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsPage.xaml.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -178,6 +182,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\NameReplacements.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SettingsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -18,5 +18,9 @@ namespace ExpanseWatcher
 
         public static ObservableCollection<Category> Categories { get; set; } = new ObservableCollection<Category>();
 
+        public static ObservableCollection<Setting> Settings { get; set; } = new ObservableCollection<Setting>();
+
+        public const string PAYPAL_FOLDER_SETTING = "PayPalFolder";
+
     }
 }

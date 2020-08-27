@@ -12,7 +12,7 @@ namespace ExpanseWatcher.ViewModels
 {
     class MainWindowVM : BaseViewModel
     {
-        MailClient _mailClient=new MailClient();
+        MailClient _mailClient = new MailClient();
         /// <summary>
         /// Constructor
         /// </summary>
@@ -31,15 +31,27 @@ namespace ExpanseWatcher.ViewModels
             // get categories until now from database
             DataBaseHelper.GetCategoriesFromDB().ForEach(cat => Globals.Categories.Add(cat));
 
+            // get settings from database
+            DataBaseHelper.GetSettingsFromDB().ForEach(set => Globals.Settings.Add(set));
+            
+            // initialize default settings
+            if (!Globals.Settings.Any(s => s.Name == Globals.PAYPAL_FOLDER_SETTING))
+            {
+                Globals.Settings.Add(new Setting(Globals.PAYPAL_FOLDER_SETTING, "PayPal"));
+            }
+
             // initialize update timer
             checkMailTimer = new Timer(1000 * 60 * 20);
             checkMailTimer.Elapsed += CheckMailTimer_Elapsed;
             checkMailTimer.Start();
 
+
+
             OverviewCommand = new RelayCommand(ShowOverview);
             ReplacementsCommand = new RelayCommand(ShowReplacements);
             CategoriesCommand = new RelayCommand(ShowCategories);
             ChartsCommand = new RelayCommand(ShowCharts);
+            SettingsCommand = new RelayCommand(ShowSettings);
 
             Task.Run(() =>
             {
@@ -58,19 +70,19 @@ namespace ExpanseWatcher.ViewModels
             Task.Run(() =>
             {
                 _mailClient.ReadImap();
-            });                       
+            });
         }
 
         private void _mailClient_MailFinished()
         {
             // refresh payments in view
-            App.Current.Dispatcher.Invoke(()=> 
+            App.Current.Dispatcher.Invoke(() =>
             {
                 Globals.Payments.Clear();
                 // get payments until now from database
                 DataBaseHelper.GetPaymentsFromDB().ForEach(pm => Globals.Payments.Add(pm));
             });
-            
+
         }
 
         private Timer checkMailTimer;
@@ -87,7 +99,7 @@ namespace ExpanseWatcher.ViewModels
             }
             set
             {
-                if (_displayPage!=value)
+                if (_displayPage != value)
                 {
                     _displayPage = value;
                     NotifyPropertyChanged();
@@ -99,18 +111,21 @@ namespace ExpanseWatcher.ViewModels
         public RelayCommand ReplacementsCommand { get; private set; }
         public RelayCommand CategoriesCommand { get; private set; }
         public RelayCommand ChartsCommand { get; private set; }
+        public RelayCommand SettingsCommand { get; private set; }
 
         private void ShowOverview(object o) { DisplayPage = new Views.ExpenseOverviewPage(); Save(); }
         private void ShowReplacements(object o) { DisplayPage = new Views.NameReplacementsPage(); Save(); }
         private void ShowCategories(object o) { DisplayPage = new Views.CategoriesPage(); Save(); }
         private void ShowCharts(object o) { DisplayPage = new Views.ChartsPage(); Save(); }
+        private void ShowSettings(object o) { DisplayPage = new Views.SettingsPage(); Save(); }
 
-        private void Save ()
+        private void Save()
         {
             Task.Run(() =>
             {
                 DataBaseHelper.SaveReplacementsToDB();
                 DataBaseHelper.SaveCategoriesToDB();
+                DataBaseHelper.SaveSettingsToDB();
             });
         }
     }
