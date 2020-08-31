@@ -244,59 +244,5 @@ namespace ExpanseWatcher
                 return null;
             }
         }
-
-        /// <summary>
-        /// Gets all replacements from the database
-        /// </summary>
-        /// <param name="path">The path to the database</param>
-        /// <returns></returns>
-        public static List<Setting> GetSettingsFromDB(string path = DEFAULTPATH)
-        {
-            try
-            {   // connect to the database
-                using (SQLiteConnection con = new SQLiteConnection(path))
-                {
-                    // get the required tables of the database
-                    con.CreateTable<Setting>();
-                    // return the table as list, orderd by the ShareName
-                    return con.Table<Setting>().OrderBy(s=>s.Name).ToList();
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Log("GetSettingsFromDB : " + ex);
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Adds a category to the database
-        /// </summary>
-        /// <param name="item">The <see cref="Category"/> to add to the database</param>
-        /// <param name="path">The path to the database</param>
-        /// <returns></returns>
-        public static short SaveSettingsToDB(string path = DEFAULTPATH)
-        {
-            try
-            {   // connect to the database
-                using (SQLiteConnection con = new SQLiteConnection(path))
-                {
-                    // get the required tables of the database                    
-                    con.DropTable<Setting>();
-                    con.CreateTable<Setting>();
-                    foreach (var set in Globals.Settings)
-                    {
-                        con.Insert(set);
-                    }
-                }
-
-                return 1;
-            }
-            catch (Exception ex)
-            {
-                Logger.Log("AddSettingToDB : " + ex);
-                return -1;
-            }
-        }
     }
 }

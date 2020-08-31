@@ -7,13 +7,12 @@
         xmlns:vms="clr-namespace:ExpanseWatcher.ViewModels"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <!--<Window.DataContext>
+    <Window.DataContext>
         <vms:MainWindowVM/>
-    </Window.DataContext>-->
+    </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
@@ -22,19 +21,7 @@
             <MenuItem Header="Replacements" Command="{Binding ReplacementsCommand}"/>
             <MenuItem Header="Categories" Command="{Binding CategoriesCommand}"/>
             <MenuItem Header="Charts" Command="{Binding ChartsCommand}"/>
-            <MenuItem Header="Settings" Command="{Binding SettingsCommand}"/>
         </Menu>
-        <StackPanel Orientation="Horizontal" Margin="5" Grid.Row="1" Visibility="{Binding DateVisibility}">
-            <Label>StartDate</Label>
-            <DatePicker SelectedDateFormat="Short" SelectedDate="{Binding Start_SelectedDate}"
-                  DisplayDateStart="{Binding Start_StartDate}" DisplayDateEnd="{Binding Start_EndDate}" 
-                  FirstDayOfWeek="Monday"/>
-            <Label Width="20"/>
-            <Label>EndDate</Label>
-            <DatePicker SelectedDateFormat="Short" SelectedDate="{Binding End_SelectedDate}"
-                  DisplayDateStart="{Binding End_StartDate}" DisplayDateEnd="{Binding End_EndDate}" 
-                  FirstDayOfWeek="Monday"/>
-        </StackPanel>
-        <Frame Content="{Binding DisplayPage}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="2" NavigationUIVisibility="Hidden"/>
+        <Frame Content="{Binding DisplayPage}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="1" NavigationUIVisibility="Hidden"/>
     </Grid>
 </Window>

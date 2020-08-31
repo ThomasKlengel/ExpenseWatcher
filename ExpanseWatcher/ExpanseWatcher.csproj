@@ -129,9 +129,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Setting.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="Mail\MailClient.cs" />
+    <Compile Include="Setting.cs" />
     <Compile Include="Shop.cs" />
     <Compile Include="ViewModels\CategoriesPageVM.cs" />
     <Compile Include="ViewModels\ChartsPageVM.cs" />

@@ -11,7 +11,7 @@ namespace ExpanseWatcher.ViewModels
     {
         public ExpenseOverviewVM()
         {
-            Globals.MainWindowVM.DateChanged += MainWindowVM_DateChanged;
+            //Globals.MainWindowVM.DateChanged += MainWindowVM_DateChanged;
         }
 
         private void MainWindowVM_DateChanged()
@@ -24,11 +24,11 @@ namespace ExpanseWatcher.ViewModels
         {
             get
             {
-                _localPayments.Clear();
-                Globals.Payments
-                    .Where(p => p.DateOfPayment >= Globals.MainWindowVM.Start_SelectedDate && p.DateOfPayment <= Globals.MainWindowVM.End_SelectedDate)
-                    .ToList().ForEach(p => _localPayments.Add(p));
-                return _localPayments;
+                //_localPayments.Clear();
+                //Globals.Payments
+                //    .Where(p => p.DateOfPayment >= Start_SelectedDate && p.DateOfPayment <= End_SelectedDate)
+                //    .ToList().ForEach(p => _localPayments.Add(p));
+                return Globals.Payments; //_localPayments;
             }
         }
     }

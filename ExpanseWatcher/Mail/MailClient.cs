@@ -55,8 +55,7 @@ namespace ExpanseWatcher
                                     pw
                                 );
 
-            var payPalFolder = Globals.Settings.FirstOrDefault(s => s.Name == Globals.PAYPAL_FOLDER_SETTING).Value;
-            var emailList = mailRepository.GetMailsSince(payPalFolder, new DateTime(date.Year, date.Month, date.Day));
+            var emailList = mailRepository.GetMailsSince("PayPal", new DateTime(date.Year, date.Month, date.Day));
             var newPayments = new List<Payment>();
 
             var regexStrings = new List<string>();
