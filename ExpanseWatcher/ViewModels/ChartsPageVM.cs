@@ -14,15 +14,16 @@ namespace ExpanseWatcher.ViewModels
     {
 
         public ChartsPageVM()
-        {            
-            Start_StartDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
-            Start_EndDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
-            End_StartDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
-            End_EndDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
-            Start_SelectedDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
-            End_SelectedDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
-
+        {
+            Globals.MainWindowVM.DateChanged += MainWindowVM_DateChanged;           
             SelectedChart = Charts.First();
+        }
+
+        private void MainWindowVM_DateChanged()
+        {
+            NotifyPropertyChanged(nameof(PieSeries));
+            NotifyPropertyChanged(nameof(StackedAreaSeries));
+            NotifyPropertyChanged(nameof(StackedLineSeries));
         }
 
         public ObservableCollection<string> Charts { get; set; } = new ObservableCollection<string>() { "Pie/Kuchen", "StackedLine", "StackedArea" };
@@ -45,111 +46,111 @@ namespace ExpanseWatcher.ViewModels
             }
         }
 
-        private DateTime _start_StartDate;
-        public DateTime Start_StartDate
-        {
-            get { return _start_StartDate; }
-            set
-            {
-                if (_start_StartDate != value)
-                {
-                    _start_StartDate = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+        //private DateTime _start_StartDate;
+        //public DateTime Start_StartDate
+        //{
+        //    get { return _start_StartDate; }
+        //    set
+        //    {
+        //        if (_start_StartDate != value)
+        //        {
+        //            _start_StartDate = value;
+        //            NotifyPropertyChanged();
+        //        }
+        //    }
+        //}
 
-        private DateTime _start_EndDate;
-        public DateTime Start_EndDate
-        {
-            get { return _start_EndDate; }
-            set
-            {
-                if (_start_EndDate != value)
-                {
-                    _start_EndDate = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+        //private DateTime _start_EndDate;
+        //public DateTime Start_EndDate
+        //{
+        //    get { return _start_EndDate; }
+        //    set
+        //    {
+        //        if (_start_EndDate != value)
+        //        {
+        //            _start_EndDate = value;
+        //            NotifyPropertyChanged();
+        //        }
+        //    }
+        //}
 
-        private DateTime _end_StartDate;
-        public DateTime End_StartDate
-        {
-            get { return _end_StartDate; }
-            set
-            {
-                if (_end_StartDate != value)
-                {
-                    _end_StartDate = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+        //private DateTime _end_StartDate;
+        //public DateTime End_StartDate
+        //{
+        //    get { return _end_StartDate; }
+        //    set
+        //    {
+        //        if (_end_StartDate != value)
+        //        {
+        //            _end_StartDate = value;
+        //            NotifyPropertyChanged();
+        //        }
+        //    }
+        //}
 
-        private DateTime _end_EndDate;
-        public DateTime End_EndDate
-        {
-            get { return _end_EndDate; }
-            set
-            {
-                if (_end_EndDate != value)
-                {
-                    _end_EndDate = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+        //private DateTime _end_EndDate;
+        //public DateTime End_EndDate
+        //{
+        //    get { return _end_EndDate; }
+        //    set
+        //    {
+        //        if (_end_EndDate != value)
+        //        {
+        //            _end_EndDate = value;
+        //            NotifyPropertyChanged();
+        //        }
+        //    }
+        //}
 
-        private DateTime _start_SelectedDate;
-        public DateTime Start_SelectedDate
-        {
-            get { return _start_SelectedDate; }
-            set
-            {
-                if (_start_SelectedDate != value)
-                {
-                    _start_SelectedDate = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged(nameof(PieSeries));
-                    NotifyPropertyChanged(nameof(StackedAreaSeries));
-                    NotifyPropertyChanged(nameof(StackedLineSeries));
-                }
-            }
-        }
+        //private DateTime _start_SelectedDate;
+        //public DateTime Start_SelectedDate
+        //{
+        //    get { return _start_SelectedDate; }
+        //    set
+        //    {
+        //        if (_start_SelectedDate != value)
+        //        {
+        //            _start_SelectedDate = value;
+        //            NotifyPropertyChanged();
+        //            NotifyPropertyChanged(nameof(PieSeries));
+        //            NotifyPropertyChanged(nameof(StackedAreaSeries));
+        //            NotifyPropertyChanged(nameof(StackedLineSeries));
+        //        }
+        //    }
+        //}
 
-        private DateTime _end_SelectedDate;
-        public DateTime End_SelectedDate
-        {
-            get { return _end_SelectedDate; }
-            set
-            {
-                if (_end_SelectedDate != value)
-                {
-                    _end_SelectedDate = value.AddHours(23).AddMinutes(59).AddSeconds(59);
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged(nameof(PieSeries));
-                    NotifyPropertyChanged(nameof(StackedAreaSeries));
-                    NotifyPropertyChanged(nameof(StackedLineSeries));
-                }
-            }
-        }
+        //private DateTime _end_SelectedDate;
+        //public DateTime End_SelectedDate
+        //{
+        //    get { return _end_SelectedDate; }
+        //    set
+        //    {
+        //        if (_end_SelectedDate != value)
+        //        {
+        //            _end_SelectedDate = value.AddHours(23).AddMinutes(59).AddSeconds(59);
+        //            NotifyPropertyChanged();
+        //            NotifyPropertyChanged(nameof(PieSeries));
+        //            NotifyPropertyChanged(nameof(StackedAreaSeries));
+        //            NotifyPropertyChanged(nameof(StackedLineSeries));
+        //        }
+        //    }
+        //}
 
-        private List<Payment> localPayments 
-        {
-            get
-            {
-                return Globals.Payments
-                    .Where(p => p.DateOfPayment >= Start_SelectedDate && p.DateOfPayment <= End_SelectedDate)
-                    .ToList();
-            }
-        }
+        //private List<Payment> localPayments 
+        //{
+        //    get
+        //    {
+        //        return Globals.Payments
+        //            .Where(p => p.DateOfPayment >= Start_SelectedDate && p.DateOfPayment <= End_SelectedDate)
+        //            .ToList();
+        //    }
+        //}
         private List<Category> localCategories
         {
             get
             {
                 List<Category> categories = new List<Category>();
-                foreach (var p in localPayments)
+                foreach (var p in Globals.MainWindowVM.localPayments)
                 {
                     var category = Globals.Categories.Where(c => c.AttachedShops.Contains(p.Shop)).FirstOrDefault();
                     if (category == null)
@@ -202,7 +203,7 @@ namespace ExpanseWatcher.ViewModels
                     var sumPrice = 0.0;
                     foreach (var shop in cat.AttachedShops)
                     {
-                        localPayments.Where(p => p.Shop == shop).ToList().ForEach(p => { sumPrice += p.Price;});
+                        Globals.MainWindowVM.localPayments.Where(p => p.Shop == shop).ToList().ForEach(p => { sumPrice += p.Price;});
                     }
                     // add data to series collection
                     series.Values = new ChartValues<Double>() { sumPrice };
@@ -234,7 +235,7 @@ namespace ExpanseWatcher.ViewModels
                         var sumX = 0.0;
                         foreach (var shop in cat.AttachedShops)
                         {
-                            localPayments.Where(p => p.Shop == shop
+                            Globals.MainWindowVM.localPayments.Where(p => p.Shop == shop
                                 && p.DateOfPayment > DateTimeOffset.Now.AddDays((-i - 1) * 7)
                                 && p.DateOfPayment < DateTimeOffset.Now.AddDays(-i * 7))
                                 .ToList().ForEach(p => { sumX += p.Price; });
@@ -268,13 +269,13 @@ namespace ExpanseWatcher.ViewModels
 
                     // initialzie list
                     List<DateTimePoint> sumPrices = new List<DateTimePoint>();
-                    localPayments.ForEach(p => sumPrices.Add(new DateTimePoint(new DateTime(p.DateOfPayment.Ticks), 0)));
+                    Globals.MainWindowVM.localPayments.ForEach(p => sumPrices.Add(new DateTimePoint(new DateTime(p.DateOfPayment.Ticks), 0)));
                     sumPrices.Add(new DateTimePoint(DateTime.Today.AddDays(2), 0));
 
                     // put all pyaments of the category into the list
                     foreach (var shop in cat.AttachedShops)
                     {
-                        localPayments
+                        Globals.MainWindowVM.localPayments
                             .Where(p => p.Shop == shop)
                             .OrderBy(p => p.DateOfPayment)
                             .ToList().ForEach(p =>

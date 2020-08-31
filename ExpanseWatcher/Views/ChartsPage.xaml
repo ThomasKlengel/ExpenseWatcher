@@ -19,7 +19,7 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical" Grid.Row="0">
             <ComboBox ItemsSource="{Binding Charts}" SelectedItem="{Binding SelectedChart}" Margin="5"/>
-            <StackPanel Orientation="Horizontal" Margin="5">
+            <!--<StackPanel Orientation="Horizontal" Margin="5">
                 <Label>StartDate</Label> 
                 <DatePicker SelectedDateFormat="Short" SelectedDate="{Binding Start_SelectedDate}"
                   DisplayDateStart="{Binding Start_StartDate}" DisplayDateEnd="{Binding Start_EndDate}" 
@@ -29,7 +29,7 @@
                 <DatePicker SelectedDateFormat="Short" SelectedDate="{Binding End_SelectedDate}"
                   DisplayDateStart="{Binding End_StartDate}" DisplayDateEnd="{Binding End_EndDate}" 
                   FirstDayOfWeek="Monday"/>
-            </StackPanel>
+            </StackPanel>-->
         </StackPanel>
         <Grid Grid.Row="1" Margin="5">
             <lvc:PieChart LegendLocation="Bottom" Hoverable="False" Series="{Binding PieSeries}" Visibility="{Binding PieVisible}"/>

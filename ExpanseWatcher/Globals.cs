@@ -22,5 +22,7 @@ namespace ExpanseWatcher
 
         public const string PAYPAL_FOLDER_SETTING = "PayPalFolder";
 
+        public static MainWindowVM MainWindowVM { get; set; } = new MainWindowVM();
+
     }
 }

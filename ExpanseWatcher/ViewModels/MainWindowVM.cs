@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows;
 using System.Windows.Controls;
 using ViewModel;
 
 namespace ExpanseWatcher.ViewModels
 {
-    class MainWindowVM : BaseViewModel
+    public class MainWindowVM : BaseViewModel
     {
         MailClient _mailClient = new MailClient();
         /// <summary>
@@ -33,7 +34,7 @@ namespace ExpanseWatcher.ViewModels
 
             // get settings from database
             DataBaseHelper.GetSettingsFromDB().ForEach(set => Globals.Settings.Add(set));
-            
+
             // initialize default settings
             if (!Globals.Settings.Any(s => s.Name == Globals.PAYPAL_FOLDER_SETTING))
             {
@@ -45,13 +46,32 @@ namespace ExpanseWatcher.ViewModels
             checkMailTimer.Elapsed += CheckMailTimer_Elapsed;
             checkMailTimer.Start();
 
-
-
+            // set commands
             OverviewCommand = new RelayCommand(ShowOverview);
             ReplacementsCommand = new RelayCommand(ShowReplacements);
             CategoriesCommand = new RelayCommand(ShowCategories);
             ChartsCommand = new RelayCommand(ShowCharts);
             SettingsCommand = new RelayCommand(ShowSettings);
+
+            if (Globals.Payments.Any())
+            {
+                // set dates
+                Start_StartDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
+                Start_EndDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
+                End_StartDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
+                End_EndDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
+                Start_SelectedDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
+                End_SelectedDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
+            }
+            else
+            {
+                Start_StartDate = DateTime.Now.AddYears(-1);
+                Start_EndDate = DateTime.Now.AddYears(-1);
+                End_StartDate = DateTime.Now;
+                End_EndDate = DateTime.Now;
+                Start_SelectedDate = DateTime.Now.AddDays(-1);
+                End_SelectedDate = DateTime.Now;
+            }
 
             Task.Run(() =>
             {
@@ -107,17 +127,128 @@ namespace ExpanseWatcher.ViewModels
             }
         }
 
+
+        private DateTime _start_StartDate;
+        public DateTime Start_StartDate
+        {
+            get { return _start_StartDate; }
+            set
+            {
+                if (_start_StartDate != value)
+                {
+                    _start_StartDate = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private DateTime _start_EndDate;
+        public DateTime Start_EndDate
+        {
+            get { return _start_EndDate; }
+            set
+            {
+                if (_start_EndDate != value)
+                {
+                    _start_EndDate = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private DateTime _end_StartDate;
+        public DateTime End_StartDate
+        {
+            get { return _end_StartDate; }
+            set
+            {
+                if (_end_StartDate != value)
+                {
+                    _end_StartDate = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private DateTime _end_EndDate;
+        public DateTime End_EndDate
+        {
+            get { return _end_EndDate; }
+            set
+            {
+                if (_end_EndDate != value)
+                {
+                    _end_EndDate = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private DateTime _start_SelectedDate;
+        public DateTime Start_SelectedDate
+        {
+            get { return _start_SelectedDate; }
+            set
+            {
+                if (_start_SelectedDate != value)
+                {
+                    _start_SelectedDate = value;
+                    NotifyPropertyChanged();
+                    RaiseDateChanged();
+                }
+            }
+        }
+
+        private DateTime _end_SelectedDate;
+        public DateTime End_SelectedDate
+        {
+            get { return _end_SelectedDate; }
+            set
+            {
+                if (_end_SelectedDate != value)
+                {
+                    _end_SelectedDate = value.AddHours(23).AddMinutes(59).AddSeconds(59);
+                    NotifyPropertyChanged();
+                    RaiseDateChanged();
+                }
+            }
+        }
+
+        public List<Payment> localPayments
+        {
+            get
+            {
+                return Globals.Payments
+                    .Where(p => p.DateOfPayment >= Start_SelectedDate && p.DateOfPayment <= End_SelectedDate)
+                    .ToList();
+            }
+        }
+
+        private Visibility _dateVisibility = Visibility.Visible;
+        public Visibility DateVisibility
+        {
+            get { return _dateVisibility; }
+            set
+            {
+                if (_dateVisibility != value)
+                {
+                    _dateVisibility = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         public RelayCommand OverviewCommand { get; private set; }
         public RelayCommand ReplacementsCommand { get; private set; }
         public RelayCommand CategoriesCommand { get; private set; }
         public RelayCommand ChartsCommand { get; private set; }
         public RelayCommand SettingsCommand { get; private set; }
 
-        private void ShowOverview(object o) { DisplayPage = new Views.ExpenseOverviewPage(); Save(); }
-        private void ShowReplacements(object o) { DisplayPage = new Views.NameReplacementsPage(); Save(); }
-        private void ShowCategories(object o) { DisplayPage = new Views.CategoriesPage(); Save(); }
-        private void ShowCharts(object o) { DisplayPage = new Views.ChartsPage(); Save(); }
-        private void ShowSettings(object o) { DisplayPage = new Views.SettingsPage(); Save(); }
+        private void ShowOverview(object o) { DisplayPage = new Views.ExpenseOverviewPage(); Save(); DateVisibility = Visibility.Visible; }
+        private void ShowReplacements(object o) { DisplayPage = new Views.NameReplacementsPage(); Save(); DateVisibility = Visibility.Collapsed; }
+        private void ShowCategories(object o) { DisplayPage = new Views.CategoriesPage(); Save(); DateVisibility = Visibility.Collapsed; }
+        private void ShowCharts(object o) { DisplayPage = new Views.ChartsPage(); Save(); DateVisibility = Visibility.Visible; }
+        private void ShowSettings(object o) { DisplayPage = new Views.SettingsPage(); Save(); DateVisibility = Visibility.Collapsed; }
 
         private void Save()
         {
@@ -128,5 +259,17 @@ namespace ExpanseWatcher.ViewModels
                 DataBaseHelper.SaveSettingsToDB();
             });
         }
+
+        public event DateChangedEventHandler DateChanged;
+
+        public void RaiseDateChanged()
+        {
+            if (DateChanged != null)
+            {
+                DateChanged();
+            }
+        }
     }
+
+    public delegate void DateChangedEventHandler();
 }
