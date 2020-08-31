@@ -127,7 +127,7 @@ namespace ExpanseWatcher.ViewModels
             }
         }
 
-
+        #region Date seetings
         private DateTime _start_StartDate;
         public DateTime Start_StartDate
         {
@@ -238,6 +238,18 @@ namespace ExpanseWatcher.ViewModels
             }
         }
 
+        public event DateChangedEventHandler DateChanged;
+
+        public void RaiseDateChanged()
+        {
+            if (DateChanged != null)
+            {
+                DateChanged();
+            }
+        }
+        #endregion
+
+        #region Commands
         public RelayCommand OverviewCommand { get; private set; }
         public RelayCommand ReplacementsCommand { get; private set; }
         public RelayCommand CategoriesCommand { get; private set; }
@@ -258,17 +270,8 @@ namespace ExpanseWatcher.ViewModels
                 DataBaseHelper.SaveCategoriesToDB();
                 DataBaseHelper.SaveSettingsToDB();
             });
-        }
-
-        public event DateChangedEventHandler DateChanged;
-
-        public void RaiseDateChanged()
-        {
-            if (DateChanged != null)
-            {
-                DateChanged();
-            }
-        }
+        } 
+        #endregion
     }
 
     public delegate void DateChangedEventHandler();

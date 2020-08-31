@@ -174,6 +174,8 @@ namespace ExpanseWatcher.ViewModels
             }
         }
 
+        #region Charts
+        #region Chart Visibility
         public Visibility PieVisible
         {
             get { return SelectedChart == "Pie/Kuchen" ? Visibility.Visible : Visibility.Collapsed; }
@@ -188,6 +190,7 @@ namespace ExpanseWatcher.ViewModels
         {
             get { return SelectedChart == "StackedArea" ? Visibility.Visible : Visibility.Collapsed; }
         }
+        #endregion
 
         public SeriesCollection PieSeries
         {
@@ -203,7 +206,7 @@ namespace ExpanseWatcher.ViewModels
                     var sumPrice = 0.0;
                     foreach (var shop in cat.AttachedShops)
                     {
-                        Globals.MainWindowVM.localPayments.Where(p => p.Shop == shop).ToList().ForEach(p => { sumPrice += p.Price;});
+                        Globals.MainWindowVM.localPayments.Where(p => p.Shop == shop).ToList().ForEach(p => { sumPrice += p.Price; });
                     }
                     // add data to series collection
                     series.Values = new ChartValues<Double>() { sumPrice };
@@ -303,6 +306,7 @@ namespace ExpanseWatcher.ViewModels
             }
         }
 
+        #region Axis labeling
         /// <summary>
         /// A formatter for the x-axis values of the chart
         /// </summary>
@@ -324,6 +328,8 @@ namespace ExpanseWatcher.ViewModels
                 return val => val.ToString("N0") + "€";
             }
         }
+        #endregion 
+        #endregion
 
     }
 }
