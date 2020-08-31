@@ -21,7 +21,7 @@ namespace ExpanseWatcher.ViewModels
         {
             _mailClient.MailFinished += _mailClient_MailFinished;
             // initial page is overview
-            DisplayPage = new Views.ExpenseOverviewPage();
+            //DisplayPage = new Views.ExpenseOverviewPage();
 
             // get payments until now from database
             DataBaseHelper.GetPaymentsFromDB().ForEach(pm => Globals.Payments.Add(pm));
@@ -77,6 +77,7 @@ namespace ExpanseWatcher.ViewModels
             {
                 _mailClient.ReadImap();
             });
+                       
         }
 
         /// <summary>
@@ -194,6 +195,7 @@ namespace ExpanseWatcher.ViewModels
                 {
                     _start_SelectedDate = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged(nameof(LocalPayments));
                     RaiseDateChanged();
                 }
             }
@@ -209,18 +211,21 @@ namespace ExpanseWatcher.ViewModels
                 {
                     _end_SelectedDate = value.AddHours(23).AddMinutes(59).AddSeconds(59);
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged(nameof(LocalPayments));
                     RaiseDateChanged();
                 }
             }
         }
 
-        public List<Payment> localPayments
+        public ObservableCollection<Payment> LocalPayments
         {
             get
             {
-                return Globals.Payments
+                var _localPayments = new ObservableCollection<Payment>();
+                Globals.Payments
                     .Where(p => p.DateOfPayment >= Start_SelectedDate && p.DateOfPayment <= End_SelectedDate)
-                    .ToList();
+                    .ToList().ForEach(p => _localPayments.Add(p));
+                return _localPayments;
             }
         }
 
@@ -270,7 +275,7 @@ namespace ExpanseWatcher.ViewModels
                 DataBaseHelper.SaveCategoriesToDB();
                 DataBaseHelper.SaveSettingsToDB();
             });
-        } 
+        }
         #endregion
     }
 

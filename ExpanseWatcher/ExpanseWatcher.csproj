@@ -135,6 +135,7 @@
     <Compile Include="Shop.cs" />
     <Compile Include="ViewModels\CategoriesPageVM.cs" />
     <Compile Include="ViewModels\ChartsPageVM.cs" />
+    <Compile Include="ViewModels\ExpenseOverviewVM.cs" />
     <Compile Include="ViewModels\MainWindowVM.cs" />
     <Compile Include="ViewModels\NameReplacementsVM.cs" />
     <Compile Include="ViewModels\ReplacementVM.cs" />
@@ -144,8 +145,8 @@
     <Compile Include="Views\ChartsPage.xaml.cs">
       <DependentUpon>ChartsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ExpenseOverview.xaml.cs">
-      <DependentUpon>ExpenseOverview.xaml</DependentUpon>
+    <Compile Include="Views\ExpenseOverviewPage.xaml.cs">
+      <DependentUpon>ExpenseOverviewPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\NameReplacements.xaml.cs">
       <DependentUpon>NameReplacements.xaml</DependentUpon>
@@ -177,7 +178,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ExpenseOverview.xaml">
+    <Page Include="Views\ExpenseOverviewPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

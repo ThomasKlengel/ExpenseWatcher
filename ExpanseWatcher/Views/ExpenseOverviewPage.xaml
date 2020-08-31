@@ -5,15 +5,19 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:ExpanseWatcher.Views"
       xmlns:vms="clr-namespace:ExpanseWatcher"
+      xmlns:view="clr-namespace:ExpanseWatcher.ViewModels"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="NameReplacements">
+      Title="Overview">
+    <Page.DataContext>
+        <view:ExpenseOverviewVM/>
+    </Page.DataContext>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <ListView HorizontalAlignment="Left"  VerticalAlignment="Top"  ItemsSource="{Binding}" Grid.Column="0" Margin="5">
+        <ListView HorizontalAlignment="Left"  VerticalAlignment="Top"  ItemsSource="{Binding LocalPayments}" Grid.Column="0" Margin="5">
             <ListView.View>
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding Shop}" Header="Name" Width="200"/>

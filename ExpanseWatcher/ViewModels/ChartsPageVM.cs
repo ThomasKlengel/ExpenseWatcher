@@ -150,7 +150,7 @@ namespace ExpanseWatcher.ViewModels
             get
             {
                 List<Category> categories = new List<Category>();
-                foreach (var p in Globals.MainWindowVM.localPayments)
+                foreach (var p in Globals.MainWindowVM.LocalPayments)
                 {
                     var category = Globals.Categories.Where(c => c.AttachedShops.Contains(p.Shop)).FirstOrDefault();
                     if (category == null)
@@ -206,7 +206,7 @@ namespace ExpanseWatcher.ViewModels
                     var sumPrice = 0.0;
                     foreach (var shop in cat.AttachedShops)
                     {
-                        Globals.MainWindowVM.localPayments.Where(p => p.Shop == shop).ToList().ForEach(p => { sumPrice += p.Price; });
+                        Globals.MainWindowVM.LocalPayments.Where(p => p.Shop == shop).ToList().ForEach(p => { sumPrice += p.Price; });
                     }
                     // add data to series collection
                     series.Values = new ChartValues<Double>() { sumPrice };
@@ -238,7 +238,7 @@ namespace ExpanseWatcher.ViewModels
                         var sumX = 0.0;
                         foreach (var shop in cat.AttachedShops)
                         {
-                            Globals.MainWindowVM.localPayments.Where(p => p.Shop == shop
+                            Globals.MainWindowVM.LocalPayments.Where(p => p.Shop == shop
                                 && p.DateOfPayment > DateTimeOffset.Now.AddDays((-i - 1) * 7)
                                 && p.DateOfPayment < DateTimeOffset.Now.AddDays(-i * 7))
                                 .ToList().ForEach(p => { sumX += p.Price; });
@@ -272,13 +272,13 @@ namespace ExpanseWatcher.ViewModels
 
                     // initialzie list
                     List<DateTimePoint> sumPrices = new List<DateTimePoint>();
-                    Globals.MainWindowVM.localPayments.ForEach(p => sumPrices.Add(new DateTimePoint(new DateTime(p.DateOfPayment.Ticks), 0)));
+                    Globals.MainWindowVM.LocalPayments.ToList().ForEach(p => sumPrices.Add(new DateTimePoint(new DateTime(p.DateOfPayment.Ticks), 0)));
                     sumPrices.Add(new DateTimePoint(DateTime.Today.AddDays(2), 0));
 
                     // put all pyaments of the category into the list
                     foreach (var shop in cat.AttachedShops)
                     {
-                        Globals.MainWindowVM.localPayments
+                        Globals.MainWindowVM.LocalPayments
                             .Where(p => p.Shop == shop)
                             .OrderBy(p => p.DateOfPayment)
                             .ToList().ForEach(p =>

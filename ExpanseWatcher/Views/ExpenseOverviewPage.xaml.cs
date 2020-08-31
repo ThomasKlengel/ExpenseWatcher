@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using ExpanseWatcher.ViewModels;
+using System.Windows.Controls;
 namespace ExpanseWatcher.Views
 {
     /// <summary>
@@ -9,7 +10,6 @@ namespace ExpanseWatcher.Views
         public ExpenseOverviewPage()
         {
             InitializeComponent();
-            this.DataContext = Globals.Payments;
         }
     }
 
