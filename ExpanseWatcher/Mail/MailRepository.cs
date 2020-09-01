@@ -2,7 +2,7 @@
 using System;
 using System.Globalization;
 
-
+// just a marker for a dummy change
 
 /// <remarks>
 /// https://doc.4d.com/4Dv16/4D-Internet-Commands/16/IMAP-Search.301-3069816.en.html
