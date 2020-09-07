@@ -223,7 +223,7 @@ namespace ExpanseWatcher.ViewModels
                 var col = new SeriesCollection();
                 // go through each category
                 List<Payment> payInCat = new List<Payment>();
-                foreach (var cat in Globals.Categories)
+                foreach (var cat in localCategories)
                 {
                     var series = new StackedColumnSeries();
                     series.Title = cat.Name;

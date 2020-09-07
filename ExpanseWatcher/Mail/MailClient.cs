@@ -20,6 +20,8 @@ namespace ExpanseWatcher
 
         public event ReadingMailFinishedEventHandler MailFinished;
 
+        private const string DEFAULT_FOLDER = "InBox";
+
         public void RaiseMailFinished()
         {
             MailFinished?.Invoke();
@@ -56,6 +58,7 @@ namespace ExpanseWatcher
                                 );
 
             var payPalFolder = Globals.Settings.FirstOrDefault(s => s.Name == Globals.PAYPAL_FOLDER_SETTING).Value;
+            payPalFolder = payPalFolder == string.Empty ? DEFAULT_FOLDER : payPalFolder;
             var emailList = mailRepository.GetMailsSince(payPalFolder, new DateTime(date.Year, date.Month, date.Day));
             var newPayments = new List<Payment>();
 

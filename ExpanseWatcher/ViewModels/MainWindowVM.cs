@@ -37,7 +37,7 @@ namespace ExpanseWatcher.ViewModels
             // initialize default settings
             if (!Globals.Settings.Any(s => s.Name == Globals.PAYPAL_FOLDER_SETTING))
             {
-                Globals.Settings.Add(new Setting(Globals.PAYPAL_FOLDER_SETTING, "PayPal"));
+                Globals.Settings.Add(new Setting(Globals.PAYPAL_FOLDER_SETTING, "InBox"));
             }
 
             // initialize update timer
