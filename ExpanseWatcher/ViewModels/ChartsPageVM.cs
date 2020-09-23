@@ -45,6 +45,7 @@ namespace ExpanseWatcher.ViewModels
             }
         }
 
+        #region DatePicker
         private DateTime _start_StartDate;
         public DateTime Start_StartDate
         {
@@ -133,7 +134,8 @@ namespace ExpanseWatcher.ViewModels
                     NotifyPropertyChanged(nameof(StackedLineSeries));
                 }
             }
-        }
+        } 
+        #endregion
 
         private List<Payment> localPayments 
         {
@@ -173,6 +175,7 @@ namespace ExpanseWatcher.ViewModels
             }
         }
 
+        #region Chart Visibility
         public Visibility PieVisible
         {
             get { return SelectedChart == "Pie/Kuchen" ? Visibility.Visible : Visibility.Collapsed; }
@@ -186,7 +189,8 @@ namespace ExpanseWatcher.ViewModels
         public Visibility StackedAreaVisible
         {
             get { return SelectedChart == "StackedArea" ? Visibility.Visible : Visibility.Collapsed; }
-        }
+        } 
+        #endregion
 
         public SeriesCollection PieSeries
         {
@@ -221,9 +225,17 @@ namespace ExpanseWatcher.ViewModels
             get
             {
                 var col = new SeriesCollection();
-                // go through each category
                 List<Payment> payInCat = new List<Payment>();
-                foreach (var cat in localCategories)
+                // order categories by amount of payments in this category
+                var orderedCategories = new List<(Category category, int payCounter)>();
+                localCategories.ForEach(c =>
+                {
+                    var payments = localPayments.Count(p => c.AttachedShops.Contains(p.Shop));
+                    orderedCategories.Add((c, payments));
+                });
+                orderedCategories = orderedCategories.OrderBy(oc => oc.payCounter).ToList();
+                // go through each category...
+                foreach (var cat in orderedCategories.Select(oc=>oc.category))
                 {
                     var series = new StackedColumnSeries();
                     series.Title = cat.Name;
