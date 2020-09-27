@@ -65,6 +65,7 @@ namespace ExpanseWatcher
             var regexStrings = new List<string>();
             regexStrings.Add("Sie\\shaben\\s((eine\\s(Zahlung|Bestellung)\\süber\\s)|)(\\W{0,1}|.*;)(\\d+[,.]\\d{2})[\\s\\S]EUR\\san (.*) (genehmigt|gesendet|autorisiert)");
 
+            List<int> messagesToDelete = new List<int>();
             foreach (Message email in emailList)
             {
                 Match match = null;
@@ -119,6 +120,7 @@ namespace ExpanseWatcher
 
                 // put data into a class
                 newPayments.Add(new Payment(price, shop, new DateTimeOffset(email.Date.Ticks, new TimeSpan(0)), trans, auth));
+                messagesToDelete.Add(email.Id);
             }
 
             foreach (var payment in newPayments)
@@ -131,6 +133,8 @@ namespace ExpanseWatcher
             }
 
             RaiseMailFinished();
+
+            mailRepository.DeletMails(messagesToDelete, payPalFolder);
         }
     }
 }

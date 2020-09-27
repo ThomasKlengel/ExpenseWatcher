@@ -1,5 +1,6 @@
 ﻿using ActiveUp.Net.Mail;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 // just a marker for a dummy change
@@ -63,7 +64,8 @@ namespace ExpanseWatcher
         /// <returns></returns>
         public MessageCollection GetMailsSince(string mailBox, DateTime date)
         {
-            var searchPhrase = "SINCE " + date.ToString("dd-MMM-yyyy", new CultureInfo("en-US"));
+            var searchPhrase = "SINCE " + date.ToString("dd-MMM-yyyy", new CultureInfo("en-US"))+
+                " FROM service@paypal.de";
 
             return GetMails(mailBox, searchPhrase);
         }
@@ -85,10 +87,42 @@ namespace ExpanseWatcher
         public MessageCollection GetMails(string mailBox, string searchPhrase)
         {
             Mailbox mails = Client.SelectMailbox(mailBox);
+            // get the message IDs
+            var messageIds = mails.Search(searchPhrase);
+            // get the messages
             MessageCollection messages = mails.SearchParse(searchPhrase);
+            // set the message ID of the messages 
+            // this is a bit stupid, but the message collection contains everything but the ID :(
+            for (int i = 0; i < messages.Count; i++)
+            {
+                messages[i].Id = messageIds[i];
+            }
             return messages;
         }
 
+        /// <summary>
+        /// Deletes a set of E-Mails by their messageID from a given mailbox
+        /// </summary>
+        /// <param name="messageIds">The IDs of the messages to delete</param>
+        /// <param name="mailBox">The mailbox to delete the messages from</param>
+        public void DeletMails(List<int> messageIds, string mailBox)
+        {
+            // get the mailbox
+            Mailbox mails = Client.SelectMailbox(mailBox);
+
+            // create a collection of flags to set for the emails
+            var flags = new FlagCollection();
+            // set only the deleted flag
+            flags.Add(new Flag("DELETED"));
+
+            // set the flag for each email in the messageIds
+            foreach (var id in messageIds)
+            {
+                mails.SetFlags(id, flags);
+            }
+
+            // this deletes the messages
+        }
 
     }
 }

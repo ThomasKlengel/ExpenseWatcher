@@ -233,7 +233,7 @@ namespace ExpanseWatcher.ViewModels
                     var payments = localPayments.Count(p => c.AttachedShops.Contains(p.Shop));
                     orderedCategories.Add((c, payments));
                 });
-                orderedCategories = orderedCategories.OrderBy(oc => oc.payCounter).ToList();
+                orderedCategories = orderedCategories.OrderByDescending(oc => oc.payCounter).ToList();
                 // go through each category...
                 foreach (var cat in orderedCategories.Select(oc=>oc.category))
                 {
