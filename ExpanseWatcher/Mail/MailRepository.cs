@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-// just a marker for a dummy change
-
 /// <remarks>
 /// https://doc.4d.com/4Dv16/4D-Internet-Commands/16/IMAP-Search.301-3069816.en.html
 /// https://tools.ietf.org/html/rfc3501#page-51
@@ -38,12 +36,21 @@ namespace ExpanseWatcher
         }
 
         /// <summary>
+        /// Gets the ImapClient of this instance
+        /// </summary>
+        protected Imap4Client Client
+        {
+            get { return client ?? (client = new Imap4Client()); }
+        }
+
+        /// <summary>
         /// Gets all mails from a mailbox
         /// </summary>
         /// <param name="mailBox">The name of the mailbox (or folder)</param>
         /// <returns></returns>
         public MessageCollection GetAllMails(string mailBox)
         {
+            Logging.Log.Info($"Reading all mails");
             return GetMails(mailBox, "ALL");
         }
 
@@ -54,6 +61,7 @@ namespace ExpanseWatcher
         /// <returns></returns>
         public MessageCollection GetUnreadMails(string mailBox)
         {
+            Logging.Log.Info($"Reading unread mails");
             return GetMails(mailBox, "UNSEEN");
         }
 
@@ -64,19 +72,11 @@ namespace ExpanseWatcher
         /// <param name="date">The required date</param>
         /// <returns></returns>
         public MessageCollection GetMailsSince(string mailBox, DateTime date)
-        {
+        {       
             var searchPhrase = "SINCE " + date.ToString("dd-MMM-yyyy", new CultureInfo("en-US"))+
                 " FROM service@paypal.de";
-
+            Logging.Log.Info($"Reading mails: SearchPhrase:'{searchPhrase}'");
             return GetMails(mailBox, searchPhrase);
-        }
-
-        /// <summary>
-        /// Gets the ImapClient of this instance
-        /// </summary>
-        protected Imap4Client Client
-        {
-            get { return client ?? (client = new Imap4Client()); }
         }
 
         /// <summary>
@@ -87,18 +87,29 @@ namespace ExpanseWatcher
         /// <returns></returns>
         public MessageCollection GetMails(string mailBox, string searchPhrase)
         {
-            Mailbox mails = Client.SelectMailbox(mailBox);
-            // get the message IDs
-            var messageIds = mails.Search(searchPhrase);
-            // get the messages
-            MessageCollection messages = mails.SearchParse(searchPhrase);
-            // set the message ID of the messages 
-            // this is a bit stupid, but the message collection contains everything but the ID :(
-            for (int i = 0; i < messages.Count; i++)
+            try
             {
-                messages[i].Id = messageIds[i];
+                Mailbox mails = Client.SelectMailbox(mailBox);
+                // get the message IDs
+                var messageIds = mails.Search(searchPhrase);
+                // get the messages
+                MessageCollection messages = mails.SearchParse(searchPhrase);
+                // set the message ID of the messages 
+                // this is a bit stupid, but the message collection contains everything but the ID :(
+                for (int i = 0; i < messages.Count; i++)
+                {
+                    messages[i].Id = messageIds[i];
+                }
+                Logging.Log.Info($"finished reading mails: SearchPhrase: {searchPhrase}");
+                Logging.Log.Info($"Found {messages.Count} new mails");
+
+                return messages;
             }
-            return messages;
+            catch (Exception ex)
+            {
+                Logging.Log.Error($"{ex.Message}:{ex.StackTrace}");
+                return new MessageCollection();
+            }            
         }
 
         /// <summary>
@@ -108,6 +119,10 @@ namespace ExpanseWatcher
         /// <param name="mailBox">The mailbox to delete the messages from</param>
         public void DeletMails(List<int> messageIds, string mailBox)
         {
+            if (messageIds.Count<1)
+            {
+                return;
+            }
             // get the mailbox
             Mailbox mails = Client.SelectMailbox(mailBox);
 
@@ -116,11 +131,21 @@ namespace ExpanseWatcher
             // set only the deleted flag
             flags.Add(new Flag("DELETED"));
 
+            Logging.Log.Info($"Deleting {messageIds.Count} mails");
             // set the flag for each email in the messageIds
-            foreach (var id in messageIds)
+            try
             {
-                mails.SetFlags(id, flags);
+                foreach (var id in messageIds)
+                {
+                    mails.SetFlags(id, flags);
+                }
             }
+            catch (Exception ex)
+            {
+                Logging.Log.Error($"{ex.Message}:{ex.StackTrace}");
+            }
+
+            Logging.Log.Info($"Finished deleting {messageIds.Count} mails");
 
             // this deletes the messages
         }

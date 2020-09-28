@@ -12,9 +12,9 @@ namespace ExpanseWatcher.ViewModels
 {
     class ChartsPageVM : BaseViewModel
     {
-
+        #region Constructors
         public ChartsPageVM()
-        {            
+        {
             Start_StartDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
             Start_EndDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
             End_StartDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
@@ -23,8 +23,10 @@ namespace ExpanseWatcher.ViewModels
             End_SelectedDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
 
             SelectedChart = Charts.First();
-        }
+        } 
+        #endregion
 
+        #region Properties
         public ObservableCollection<string> Charts { get; set; } = new ObservableCollection<string>() { "Pie/Kuchen", "StackedLine", "StackedArea" };
 
         private string _selectedChart;
@@ -134,10 +136,10 @@ namespace ExpanseWatcher.ViewModels
                     NotifyPropertyChanged(nameof(StackedLineSeries));
                 }
             }
-        } 
+        }
         #endregion
 
-        private List<Payment> localPayments 
+        private List<Payment> localPayments
         {
             get
             {
@@ -189,7 +191,7 @@ namespace ExpanseWatcher.ViewModels
         public Visibility StackedAreaVisible
         {
             get { return SelectedChart == "StackedArea" ? Visibility.Visible : Visibility.Collapsed; }
-        } 
+        }
         #endregion
 
         public SeriesCollection PieSeries
@@ -206,7 +208,7 @@ namespace ExpanseWatcher.ViewModels
                     var sumPrice = 0.0;
                     foreach (var shop in cat.AttachedShops)
                     {
-                        localPayments.Where(p => p.Shop == shop).ToList().ForEach(p => { sumPrice += p.Price;});
+                        localPayments.Where(p => p.Shop == shop).ToList().ForEach(p => { sumPrice += p.Price; });
                     }
                     // add data to series collection
                     series.Values = new ChartValues<Double>() { sumPrice };
@@ -235,7 +237,7 @@ namespace ExpanseWatcher.ViewModels
                 });
                 orderedCategories = orderedCategories.OrderByDescending(oc => oc.payCounter).ToList();
                 // go through each category...
-                foreach (var cat in orderedCategories.Select(oc=>oc.category))
+                foreach (var cat in orderedCategories.Select(oc => oc.category))
                 {
                     var series = new StackedColumnSeries();
                     series.Title = cat.Name;
@@ -334,7 +336,7 @@ namespace ExpanseWatcher.ViewModels
             {
                 return val => val.ToString("N0") + "€";
             }
-        }
-
+        } 
+        #endregion
     }
 }

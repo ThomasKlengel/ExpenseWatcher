@@ -16,6 +16,7 @@ namespace ExpanseWatcher
         /// </summary>
         private const string DEFAULTPATH = "Payments.DB";
 
+        #region Payments
         /// <summary>
         /// Adds a <see cref="Payment"/> to the database,
         /// </summary>
@@ -24,6 +25,7 @@ namespace ExpanseWatcher
         /// <returns>1 if successful, -1 if an error occured.</returns>
         public static short AddPaymentToDB(Payment payment, string path = DEFAULTPATH)
         {
+            Logging.Log.Info($"adding pyament to database: {payment.Price}€, {payment.Shop}, {payment.DateOfPayment.ToString("yyyy-MM-dd HH:mm:ss")}");
             try
             {   // connect to the database
                 using (SQLiteConnection con = new SQLiteConnection(path))
@@ -65,7 +67,9 @@ namespace ExpanseWatcher
                 return null;
             }
         }
+        #endregion
 
+        #region Replacements
         /// <summary>
         /// Adds a replacement to the database
         /// </summary>
@@ -100,12 +104,12 @@ namespace ExpanseWatcher
             }
             catch (Exception ex)
             {
-                Logger.Log("AddPaymentToDB : " + ex);
+                Logger.Log("AddReplacementToDB : " + ex);
                 return -1;
             }
         }
 
-        public static short SaveReplacementsToDB(string path=DEFAULTPATH)
+        public static short SaveReplacementsToDB(string path = DEFAULTPATH)
         {
             try
             {   // connect to the database
@@ -123,7 +127,7 @@ namespace ExpanseWatcher
             }
             catch (Exception ex)
             {
-                Logger.Log("AddPaymentToDB : " + ex);
+                Logger.Log("SaveReplacementsToDB : " + ex);
                 return -1;
             }
 
@@ -152,7 +156,9 @@ namespace ExpanseWatcher
                 return null;
             }
         }
+        #endregion
 
+        #region Categories
         /// <summary>
         /// Adds a category to the database
         /// </summary>
@@ -227,7 +233,7 @@ namespace ExpanseWatcher
         /// <param name="path">The path to the database</param>
         /// <returns></returns>
         public static List<Category> GetCategoriesFromDB(string path = DEFAULTPATH)
-        { 
+        {
             try
             {   // connect to the database
                 using (SQLiteConnection con = new SQLiteConnection(path))
@@ -244,7 +250,9 @@ namespace ExpanseWatcher
                 return null;
             }
         }
+        #endregion
 
+        #region Settings
         /// <summary>
         /// Gets all replacements from the database
         /// </summary>
@@ -259,7 +267,7 @@ namespace ExpanseWatcher
                     // get the required tables of the database
                     con.CreateTable<Setting>();
                     // return the table as list, orderd by the ShareName
-                    return con.Table<Setting>().OrderBy(s=>s.Name).ToList();
+                    return con.Table<Setting>().OrderBy(s => s.Name).ToList();
                 }
             }
             catch (Exception ex)
@@ -297,6 +305,7 @@ namespace ExpanseWatcher
                 Logger.Log("AddSettingToDB : " + ex);
                 return -1;
             }
-        }
+        } 
+        #endregion
     }
 }

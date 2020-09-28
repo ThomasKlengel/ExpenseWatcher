@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
@@ -10,35 +6,48 @@ using ViewModel;
 
 namespace ExpanseWatcher.ViewModels
 {
+    //TODO: add class summaries
     class MainWindowVM : BaseViewModel
     {
+        #region Fields
         MailClient _mailClient = new MailClient();
+        private Timer checkMailTimer;
+        #endregion
+
+        #region Constructors
         /// <summary>
         /// Constructor
         /// </summary>
         public MainWindowVM()
         {
+            Logging.Log.Info("initializing...");
+
             _mailClient.MailFinished += _mailClient_MailFinished;
             // initial page is overview
             DisplayPage = new Views.ExpenseOverviewPage();
 
             // get payments until now from database
+            Logging.Log.Info("getting payments from database");
             DataBaseHelper.GetPaymentsFromDB().ForEach(pm => Globals.Payments.Add(pm));
+            Logging.Log.Info($"found {Globals.Payments.Count} payments");
 
             // get replacements until now from database
             DataBaseHelper.GetReplacementsFromDB().ForEach(rep => Globals.Replacements.Add(rep));
 
             // get categories until now from database
+            Logging.Log.Info("getting categories from database");
             DataBaseHelper.GetCategoriesFromDB().ForEach(cat => Globals.Categories.Add(cat));
+            Logging.Log.Info($"found {Globals.Categories.Count} categories");
 
             // get settings from database
             DataBaseHelper.GetSettingsFromDB().ForEach(set => Globals.Settings.Add(set));
-            
+
             // initialize default settings
             if (!Globals.Settings.Any(s => s.Name == Globals.PAYPAL_FOLDER_SETTING))
             {
                 Globals.Settings.Add(new Setting(Globals.PAYPAL_FOLDER_SETTING, "InBox"));
             }
+            Logging.Log.Info($"PayPal folder is {Globals.PAYPAL_FOLDER_SETTING}");
 
             // initialize update timer
             checkMailTimer = new Timer(1000 * 60 * 20);
@@ -57,36 +66,10 @@ namespace ExpanseWatcher.ViewModels
             {
                 _mailClient.ReadImap();
             });
-        }
+        } 
+        #endregion
 
-        /// <summary>
-        /// Handler for when the update timer elapses
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CheckMailTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            // read mails in seperate task
-            Task.Run(() =>
-            {
-                _mailClient.ReadImap();
-            });
-        }
-
-        private void _mailClient_MailFinished()
-        {
-            // refresh payments in view
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                Globals.Payments.Clear();
-                // get payments until now from database
-                DataBaseHelper.GetPaymentsFromDB().ForEach(pm => Globals.Payments.Add(pm));
-            });
-
-        }
-
-        private Timer checkMailTimer;
-
+        #region Properties
         private Page _displayPage;
         /// <summary>
         /// The page that is currently displayed in the main frame of the main window
@@ -105,8 +88,10 @@ namespace ExpanseWatcher.ViewModels
                     NotifyPropertyChanged();
                 }
             }
-        }
+        } 
+        #endregion
 
+        #region Commands
         public RelayCommand OverviewCommand { get; private set; }
         public RelayCommand ReplacementsCommand { get; private set; }
         public RelayCommand CategoriesCommand { get; private set; }
@@ -118,7 +103,9 @@ namespace ExpanseWatcher.ViewModels
         private void ShowCategories(object o) { DisplayPage = new Views.CategoriesPage(); Save(); }
         private void ShowCharts(object o) { DisplayPage = new Views.ChartsPage(); Save(); }
         private void ShowSettings(object o) { DisplayPage = new Views.SettingsPage(); Save(); }
+        #endregion
 
+        #region private Methods
         private void Save()
         {
             Task.Run(() =>
@@ -127,6 +114,35 @@ namespace ExpanseWatcher.ViewModels
                 DataBaseHelper.SaveCategoriesToDB();
                 DataBaseHelper.SaveSettingsToDB();
             });
+        } 
+        #endregion
+
+        #region event handlers
+        private void _mailClient_MailFinished()
+        {
+            // refresh payments in view
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                Globals.Payments.Clear();
+                // get payments until now from database
+                DataBaseHelper.GetPaymentsFromDB().ForEach(pm => Globals.Payments.Add(pm));
+            });
+
         }
+
+        /// <summary>
+        /// Handler for when the update timer elapses
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CheckMailTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            // read mails in seperate task
+            Task.Run(() =>
+            {
+                _mailClient.ReadImap();
+            });
+        } 
+        #endregion
     }
 }

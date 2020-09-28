@@ -5,8 +5,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
-
-
 /// <remarks>
 /// https://doc.4d.com/4Dv16/4D-Internet-Commands/16/IMAP-Search.301-3069816.en.html
 /// https://tools.ietf.org/html/rfc3501#page-51
@@ -16,16 +14,18 @@ namespace ExpanseWatcher
 {
     public class MailClient
     {
+        #region Events
         public delegate void ReadingMailFinishedEventHandler();
 
         public event ReadingMailFinishedEventHandler MailFinished;
 
-        private const string DEFAULT_FOLDER = "InBox";
-
         public void RaiseMailFinished()
         {
             MailFinished?.Invoke();
-        }
+        } 
+        #endregion
+
+        private const string DEFAULT_FOLDER = "InBox";
 
         /// <summary>
         /// Reads the credentials to log into gmail from a file.
@@ -42,7 +42,7 @@ namespace ExpanseWatcher
 
         public void ReadImap()
         {
-            var currentPayments = DataBaseHelper.GetPaymentsFromDB();
+            var currentPayments = DataBaseHelper.GetPaymentsFromDB();            
             DateTimeOffset date = (currentPayments?.Count > 0)
                 ? currentPayments.Last().DateOfPayment
                 : new DateTimeOffset(DateTime.Today.AddYears(-10));
@@ -123,10 +123,12 @@ namespace ExpanseWatcher
                 messagesToDelete.Add(email.Id);
             }
 
+            Logging.Log.Info($"found {newPayments.Count} new payments via PayPal");
             foreach (var payment in newPayments)
             {
                 if (currentPayments.Any(curPay => curPay.Equals(payment)))
                 {
+                    Logging.Log.Info($"payment is already in database: {payment.Price}€, {payment.Shop}, {payment.DateOfPayment.ToString("yyyy-MM-dd HH:mm:ss")}");
                     continue;
                 }
                 DataBaseHelper.AddPaymentToDB(payment);
