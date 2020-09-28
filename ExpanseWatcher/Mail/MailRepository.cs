@@ -15,6 +15,7 @@ namespace ExpanseWatcher
     /// <summary>
     /// Class handling access to a IMAP Mailserver
     /// </summary>
+    /// 
     public class MailRepository
     {       
         private Imap4Client client;
