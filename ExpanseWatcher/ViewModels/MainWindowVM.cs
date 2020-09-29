@@ -47,14 +47,12 @@ namespace ExpanseWatcher.ViewModels
             {
                 Globals.Settings.Add(new Setting(Globals.PAYPAL_FOLDER_SETTING, "InBox"));
             }
-            Logging.Log.Info($"PayPal folder is {Globals.PAYPAL_FOLDER_SETTING}");
+            Logging.Log.Info($"PayPal folder is {Globals.Settings.Where(s=>s.Name==Globals.PAYPAL_FOLDER_SETTING).First().Value}");
 
             // initialize update timer
             checkMailTimer = new Timer(1000 * 60 * 20);
             checkMailTimer.Elapsed += CheckMailTimer_Elapsed;
             checkMailTimer.Start();
-
-
 
             OverviewCommand = new RelayCommand(ShowOverview);
             ReplacementsCommand = new RelayCommand(ShowReplacements);

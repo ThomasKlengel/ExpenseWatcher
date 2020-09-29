@@ -92,6 +92,7 @@ namespace ExpanseWatcher
                 Mailbox mails = Client.SelectMailbox(mailBox);
                 // get the message IDs
                 var messageIds = mails.Search(searchPhrase);
+                Logging.Log.Info($"found {messageIds.Length-1} messages matching '{searchPhrase}'");
                 // get the messages
                 MessageCollection messages = mails.SearchParse(searchPhrase);
                 // set the message ID of the messages 
