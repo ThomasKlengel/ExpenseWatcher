@@ -15,7 +15,7 @@ namespace ExpanseWatcher
     /// </summary>
     /// 
     public class MailRepository
-    {       
+    {
         private Imap4Client client;
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace ExpanseWatcher
         /// </summary>
         /// <param name="mailBox">The name of the mailbox (or folder)</param>
         /// <returns></returns>
-        public MessageCollection GetAllMails(string mailBox)
+        public List<EMail> GetAllMails(string mailBox)
         {
             Logging.Log.Info($"Reading all mails");
             return GetMails(mailBox, "ALL");
@@ -59,7 +59,7 @@ namespace ExpanseWatcher
         /// </summary>
         /// <param name="mailBox">The name of the mailbox (or folder)</param>
         /// <returns></returns>
-        public MessageCollection GetUnreadMails(string mailBox)
+        public List<EMail> GetUnreadMails(string mailBox)
         {
             Logging.Log.Info($"Reading unread mails");
             return GetMails(mailBox, "UNSEEN");
@@ -71,9 +71,9 @@ namespace ExpanseWatcher
         /// <param name="mailBox">The name of the mailbox (or folder)</param>
         /// <param name="date">The required date</param>
         /// <returns></returns>
-        public MessageCollection GetMailsSince(string mailBox, DateTime date)
-        {       
-            var searchPhrase = "SINCE " + date.ToString("dd-MMM-yyyy", new CultureInfo("en-US"))+
+        public List<EMail> GetMailsSince(string mailBox, DateTime date)
+        {
+            var searchPhrase = "SINCE " + date.ToString("dd-MMM-yyyy", new CultureInfo("en-US")) +
                 " FROM service@paypal.de";
             Logging.Log.Info($"Reading mails: SearchPhrase:'{searchPhrase}'");
             return GetMails(mailBox, searchPhrase);
@@ -82,74 +82,94 @@ namespace ExpanseWatcher
         /// <summary>
         /// Gets all mail from a mailbox that match the criteria
         /// </summary>
-        /// <param name="mailBox">The name of the mailbox (or folder)</param>
+        /// <param name="mailBoxName">The name of the mailbox (or folder)</param>
         /// <param name="searchPhrase">The criteria to search for</param>
         /// <returns></returns>
-        public MessageCollection GetMails(string mailBox, string searchPhrase)
+        public List<EMail> GetMails(string mailBoxName, string searchPhrase)
         {
             try
             {
-                Mailbox mails = Client.SelectMailbox(mailBox);
+                Mailbox mailBox = Client.SelectMailbox(mailBoxName);
+
+
                 // get the message IDs
-                var messageIds = mails.Search(searchPhrase);
-                Logging.Log.Info($"found {messageIds.Length-1} messages matching '{searchPhrase}'");
+                var messageIds = mailBox.Search(searchPhrase);
+                Logging.Log.Info($"found {messageIds.Length - 1} messages matching '{searchPhrase}'");
                 // get the messages
-                MessageCollection messages = mails.SearchParse(searchPhrase);
+                MessageCollection messages = mailBox.SearchParse(searchPhrase);
                 // set the message ID of the messages 
                 // this is a bit stupid, but the message collection contains everything but the ID :(
+                List<EMail> mails = new List<EMail>();
                 for (int i = 0; i < messages.Count; i++)
                 {
-                    messages[i].Id = messageIds[i];
+                    mails.Add(
+                        new EMail()
+                        {
+                            Body = messages[i].BodyHtml.TextStripped,
+                            InBoxID = mailBoxName.ToUpperInvariant() == "INBOX" ? messageIds[i] : -1,
+                            PayPalFolderID = mailBoxName.ToUpperInvariant() == "INBOX" ? -1 : messageIds[i],
+                            Subject = messages[i].Subject,
+                            TimeReceived = messages[i].Date
+                        });
                 }
                 Logging.Log.Info($"finished reading mails: SearchPhrase: {searchPhrase}");
                 Logging.Log.Info($"Found {messages.Count} new mails");
 
-                return messages;
+                return mails;
             }
             catch (Exception ex)
             {
                 Logging.Log.Error($"{ex.Message}:{ex.StackTrace}");
-                return new MessageCollection();
-            }            
+                return new List<EMail>();
+            }
         }
 
         /// <summary>
         /// Deletes a set of E-Mails by their messageID from a given mailbox
         /// </summary>
-        /// <param name="messageIds">The IDs of the messages to delete</param>
-        /// <param name="mailBox">The mailbox to delete the messages from</param>
-        public void DeletMails(List<int> messageIds, string mailBox)
+        /// <param name="messages">The IDs of the messages to delete</param>
+        /// <param name="mailBoxName">The mailbox to delete the messages from</param>
+        public void DeleteMails(List<EMail> messages, string mailBoxName)
         {
-            if (messageIds.Count<1)
+            if (messages.Count < 1)
             {
                 return;
             }
             // get the mailbox
-            Mailbox mails = Client.SelectMailbox(mailBox);
+            Mailbox mailBox = Client.SelectMailbox(mailBoxName);
 
             // create a collection of flags to set for the emails
             var flags = new FlagCollection();
             // set only the deleted flag
             flags.Add(new Flag("DELETED"));
 
-            Logging.Log.Info($"Deleting {messageIds.Count} mails");
+            
             // set the flag for each email in the messageIds
             try
             {
-                foreach (var id in messageIds)
+                Logging.Log.Info($"Deleting {messages.Count} mails from '{mailBoxName}'");
+                if (mailBoxName == "INBOX")
                 {
-                    mails.SetFlags(id, flags);
+                    foreach (var mail in messages)
+                    {
+                        mailBox.SetFlags(mail.InBoxID, flags);
+                    }
                 }
+                else
+                {
+                    foreach (var mail in messages)
+                    {
+                        mailBox.SetFlags(mail.PayPalFolderID, flags);
+                    }
+                }
+                Logging.Log.Info($"Finished deleting {messages.Count} mails from '{mailBoxName}'");
             }
             catch (Exception ex)
             {
                 Logging.Log.Error($"{ex.Message}:{ex.StackTrace}");
-            }
+            }           
 
-            Logging.Log.Info($"Finished deleting {messageIds.Count} mails");
-
-            // this deletes the messages
+            Client.Expunge();
         }
-
     }
 }

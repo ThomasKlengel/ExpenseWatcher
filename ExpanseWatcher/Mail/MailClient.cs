@@ -15,14 +15,23 @@ namespace ExpanseWatcher
     public class MailClient
     {
         #region Events
+        /// <summary>
+        /// event handler for the MailFinished event
+        /// </summary>
         public delegate void ReadingMailFinishedEventHandler();
 
+        /// <summary>
+        /// An event that occurs when Emails have been read
+        /// </summary>
         public event ReadingMailFinishedEventHandler MailFinished;
 
+        /// <summary>
+        /// Encapsulating method for raising the MailFinished event
+        /// </summary>
         public void RaiseMailFinished()
         {
             MailFinished?.Invoke();
-        } 
+        }
         #endregion
 
         private const string DEFAULT_FOLDER = "InBox";
@@ -42,9 +51,9 @@ namespace ExpanseWatcher
 
         public void ReadImap()
         {
-            var currentPayments = DataBaseHelper.GetPaymentsFromDB();            
+            var currentPayments = DataBaseHelper.GetPaymentsFromDB();
             DateTimeOffset date = (currentPayments?.Count > 0)
-                ? currentPayments.Last().DateOfPayment
+                ? currentPayments.Last().DateOfPayment.AddDays(-1)
                 : new DateTimeOffset(DateTime.Today.AddYears(-10));
 
             GetCredentials(out string user, out string pw);
@@ -59,14 +68,25 @@ namespace ExpanseWatcher
 
             var payPalFolder = Globals.Settings.FirstOrDefault(s => s.Name == Globals.PAYPAL_FOLDER_SETTING).Value;
             payPalFolder = payPalFolder == string.Empty ? DEFAULT_FOLDER : payPalFolder;
+            // Get the mails from the Inbox and paypalfolder
             var emailList = mailRepository.GetMailsSince(payPalFolder, new DateTime(date.Year, date.Month, date.Day));
+            var emailList2 = mailRepository.GetMailsSince("INBOX", new DateTime(date.Year, date.Month, date.Day));
+            // put the ID of the Inobx into the collection
+            emailList.ForEach(mail =>
+            {
+                if (emailList2.Any(m2 => m2.TimeReceived == mail.TimeReceived))
+                {
+                    mail.InBoxID = emailList2.First(m2 => m2.TimeReceived == mail.TimeReceived).InBoxID;
+                }
+            });
+
             var newPayments = new List<Payment>();
 
             var regexStrings = new List<string>();
             regexStrings.Add("Sie\\shaben\\s((eine\\s(Zahlung|Bestellung)\\süber\\s)|)(\\W{0,1}|.*;)(\\d+[,.]\\d{2})[\\s\\S]EUR\\san (.*) (genehmigt|gesendet|autorisiert)");
 
-            List<int> messagesToDelete = new List<int>();
-            foreach (Message email in emailList)
+            List<EMail> messagesToDelete = new List<EMail>();
+            foreach (var email in emailList)
             {
                 Match match = null;
                 var success = false;
@@ -76,7 +96,7 @@ namespace ExpanseWatcher
                     Regex paymentRegex = new Regex(reg);
 
                     // search for the match
-                    match = paymentRegex.Match(email.BodyHtml.TextStripped);
+                    match = paymentRegex.Match(email.Body);
                     // if there is no match.. continue
                     if (!match.Success)
                     {
@@ -101,7 +121,7 @@ namespace ExpanseWatcher
                 // get transaction and authorization
                 Regex transaktion = new Regex("Transaktionscode:\\s*([\\r\\n]|)\\s*(\\w{17})");
                 Regex autorisierung = new Regex("Autorisierungscode:\\s*([\\r\\n]|)\\s*(\\w{6})");
-                var tmatch = transaktion.Match(email.BodyHtml.TextStripped);
+                var tmatch = transaktion.Match(email.Body);
                 string trans = "";
                 if (tmatch.Success)
                 {
@@ -111,7 +131,7 @@ namespace ExpanseWatcher
                 {
                     continue;
                 }
-                var amatch = autorisierung.Match(email.BodyHtml.TextStripped);
+                var amatch = autorisierung.Match(email.Body);
                 string auth = "";
                 if (amatch.Success)
                 {
@@ -119,8 +139,8 @@ namespace ExpanseWatcher
                 }
 
                 // put data into a class
-                newPayments.Add(new Payment(price, shop, new DateTimeOffset(email.Date.Ticks, new TimeSpan(0)), trans, auth));
-                messagesToDelete.Add(email.Id);
+                newPayments.Add(new Payment(price, shop, new DateTimeOffset(email.TimeReceived.Ticks, new TimeSpan(0)), trans, auth));
+                messagesToDelete.Add(email);
             }
 
             Logging.Log.Info($"found {newPayments.Count} new payments via PayPal");
@@ -135,8 +155,14 @@ namespace ExpanseWatcher
             }
 
             RaiseMailFinished();
+            
+            // delete the messages from the gmail folders
+            mailRepository.DeleteMails(messagesToDelete, "INBOX");
+            if (payPalFolder.ToUpper() != "INBOX")
+            {
+                mailRepository.DeleteMails(messagesToDelete, payPalFolder);
+            }
 
-            mailRepository.DeletMails(messagesToDelete, payPalFolder);
         }
     }
 }

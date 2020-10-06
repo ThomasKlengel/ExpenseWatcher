@@ -137,6 +137,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EMail.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="Setting.cs" />
     <Compile Include="Globals.cs" />
