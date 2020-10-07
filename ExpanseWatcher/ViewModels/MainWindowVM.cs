@@ -9,8 +9,7 @@ namespace ExpanseWatcher.ViewModels
     //TODO: add class summaries
     class MainWindowVM : BaseViewModel
     {
-        #region Fields
-        MailClient _mailClient = new MailClient();
+        #region Fields        
         private Timer checkMailTimer;
         #endregion
 
@@ -22,7 +21,7 @@ namespace ExpanseWatcher.ViewModels
         {
             Logging.Log.Info("initializing...");
 
-            _mailClient.MailFinished += _mailClient_MailFinished;
+            Globals._mailClient.MailFinished += _mailClient_MailFinished;
             // initial page is overview
             DisplayPage = new Views.ExpenseOverviewPage();
 
@@ -62,7 +61,7 @@ namespace ExpanseWatcher.ViewModels
 
             Task.Run(() =>
             {
-                _mailClient.ReadImap();
+                Globals._mailClient.ReadImap();
             });
         } 
         #endregion
@@ -101,6 +100,7 @@ namespace ExpanseWatcher.ViewModels
         private void ShowCategories(object o) { DisplayPage = new Views.CategoriesPage(); Save(); }
         private void ShowCharts(object o) { DisplayPage = new Views.ChartsPage(); Save(); }
         private void ShowSettings(object o) { DisplayPage = new Views.SettingsPage(); Save(); }
+
         #endregion
 
         #region private Methods
@@ -138,7 +138,7 @@ namespace ExpanseWatcher.ViewModels
             // read mails in seperate task
             Task.Run(() =>
             {
-                _mailClient.ReadImap();
+                Globals._mailClient.ReadImap();
             });
         } 
         #endregion

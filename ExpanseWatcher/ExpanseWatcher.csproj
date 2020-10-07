@@ -145,6 +145,7 @@
     <Compile Include="Shop.cs" />
     <Compile Include="ViewModels\CategoriesPageVM.cs" />
     <Compile Include="ViewModels\ChartsPageVM.cs" />
+    <Compile Include="ViewModels\ExpenseOverviewVM.cs" />
     <Compile Include="ViewModels\MainWindowVM.cs" />
     <Compile Include="ViewModels\NameReplacementsVM.cs" />
     <Compile Include="ViewModels\ReplacementVM.cs" />

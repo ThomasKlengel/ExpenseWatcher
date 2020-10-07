@@ -9,7 +9,6 @@ namespace ExpanseWatcher.Views
         public ExpenseOverviewPage()
         {
             InitializeComponent();
-            this.DataContext = Globals.Payments;
         }
     }
 

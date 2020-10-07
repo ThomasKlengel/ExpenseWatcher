@@ -23,7 +23,7 @@ namespace ExpanseWatcher.ViewModels
             End_SelectedDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
 
             SelectedChart = Charts.First();
-        } 
+        }
         #endregion
 
         #region Properties
@@ -145,6 +145,7 @@ namespace ExpanseWatcher.ViewModels
             {
                 return Globals.Payments
                     .Where(p => p.DateOfPayment >= Start_SelectedDate && p.DateOfPayment <= End_SelectedDate)
+                    .OrderBy(p => p.DateOfPayment)
                     .ToList();
             }
         }
@@ -336,7 +337,7 @@ namespace ExpanseWatcher.ViewModels
             {
                 return val => val.ToString("N0") + "€";
             }
-        } 
+        }
         #endregion
     }
 }

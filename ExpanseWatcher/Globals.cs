@@ -22,5 +22,6 @@ namespace ExpanseWatcher
 
         public const string PAYPAL_FOLDER_SETTING = "PayPalFolder";
 
+        public static MailClient _mailClient = new MailClient();
     }
 }
