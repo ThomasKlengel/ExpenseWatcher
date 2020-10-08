@@ -53,29 +53,32 @@ namespace ExpanseWatcher
 
                     try
                     {
-                        var lineSplits = line.Replace("\"", "").Split(',');
-                        if (lineSplits[4]== "Allgemeine Autorisierung")
+                        var lineSplits = line.Split(new string[] { "\",\"" }, StringSplitOptions.None);
+                        if (lineSplits[4].StartsWith("Allgemeine"))
                         {
                             continue;
                         }
-                        var dateSplits = lineSplits[0].Split('.');
+                        var dateSplits = lineSplits[0].Replace("\"", "").Split('.');
                         var timeSplits = lineSplits[1].Split(':');
-                        DateTimeOffset dt = new DateTimeOffset(
-                            int.Parse(dateSplits[2]),
-                            int.Parse(dateSplits[1]),
-                            int.Parse(dateSplits[0]),
-                            int.Parse(timeSplits[2]),
-                            int.Parse(timeSplits[1]),
-                            int.Parse(timeSplits[0]),
-                            new TimeSpan(0)
-                            );
-                        var price = double.Parse($"{lineSplits[7]},{lineSplits[8]}");
-                        if (price>0)
+                        var year = int.Parse(dateSplits[2]);
+                        var month = int.Parse(dateSplits[1]);
+                        var day = int.Parse(dateSplits[0]);
+                        var hour = int.Parse(timeSplits[0]);
+                        var minute = int.Parse(timeSplits[1]);
+                        var second = int.Parse(timeSplits[2]);
+
+                        var dt = new DateTimeOffset(
+                        year, month, day, hour, minute, second,
+                        new TimeSpan(0)
+                        );
+
+                        var price = double.Parse(lineSplits[7]);
+                        if (price > 0)
                         {
                             continue;
                         }
 
-                        var payment = new Payment(-price,lineSplits[3],dt, lineSplits[15]);
+                        var payment = new Payment(-price, lineSplits[3], dt, lineSplits[12]);
                         newPayments.Add(payment);
 
                     }
@@ -89,6 +92,8 @@ namespace ExpanseWatcher
             else { return; }
 
             var currentPayments = DataBaseHelper.GetPaymentsFromDB();
+            Logging.Log.Info($"found {newPayments.Count} payments in {ofd.FileName}");
+            int i = 0;
             foreach (var payment in newPayments)
             {
                 if (currentPayments.Any(curPay => curPay.Equals(payment)))
@@ -97,7 +102,9 @@ namespace ExpanseWatcher
                     continue;
                 }
                 DataBaseHelper.AddPaymentToDB(payment);
+                i++;
             }
+            Logging.Log.Info($"added {i} new payments to database");
 
             RaiseCsvFinished();
         }
