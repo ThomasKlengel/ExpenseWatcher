@@ -1,0 +1,18 @@
+[16:22:13.505] : GetPaymentsFromDB : System.TypeInitializationException: Der Typeninitialisierer für "SQLite.SQLiteConnection" hat eine Ausnahme verursacht. ---> System.Exception: Library e_sqlite3 not found
+   bei SQLitePCL.NativeLibrary.Load(String libraryName, Assembly assy, Int32 flags)
+   bei SQLitePCL.Batteries_V2.MakeDynamic(String name, Int32 flags)
+   bei SQLitePCL.Batteries_V2.DoDynamic_cdecl(String name, Int32 flags)
+   bei SQLitePCL.Batteries_V2.Init()
+   bei SQLite.SQLiteConnection..cctor()
+   --- Ende der internen Ausnahmestapelüberwachung ---
+   bei SQLite.SQLiteConnection..ctor(String databasePath, Boolean storeDateTimeAsTicks)
+   bei ExpanseWatcher.DataBaseHelper.GetPaymentsFromDB(String path) 
+[16:22:32.821] : GetPaymentsFromDB : System.TypeInitializationException: Der Typeninitialisierer für "SQLite.SQLiteConnection" hat eine Ausnahme verursacht. ---> System.Exception: Library e_sqlite3 not found
+   bei SQLitePCL.NativeLibrary.Load(String libraryName, Assembly assy, Int32 flags)
+   bei SQLitePCL.Batteries_V2.MakeDynamic(String name, Int32 flags)
+   bei SQLitePCL.Batteries_V2.DoDynamic_cdecl(String name, Int32 flags)
+   bei SQLitePCL.Batteries_V2.Init()
+   bei SQLite.SQLiteConnection..cctor()
+   --- Ende der internen Ausnahmestapelüberwachung ---
+   bei SQLite.SQLiteConnection..ctor(String databasePath, Boolean storeDateTimeAsTicks)
+   bei ExpanseWatcher.DataBaseHelper.GetPaymentsFromDB(String path) 

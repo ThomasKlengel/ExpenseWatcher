@@ -22,6 +22,7 @@
             <MenuItem Header="Categories" Command="{Binding CategoriesCommand}"/>
             <MenuItem Header="Charts" Command="{Binding ChartsCommand}"/>
             <MenuItem Header="Settings" Command="{Binding SettingsCommand}"/>
+            <MenuItem Header="ReadCsv" Command="{Binding ReadCsvCommand}"/>
         </Menu>
         <Frame Content="{Binding DisplayPage}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="1" NavigationUIVisibility="Hidden"/>
     </Grid>

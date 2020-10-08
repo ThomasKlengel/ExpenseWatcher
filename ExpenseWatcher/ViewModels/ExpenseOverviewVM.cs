@@ -14,6 +14,7 @@ namespace ExpanseWatcher.ViewModels
             Payments = Globals.Payments;
             SortCommand = new RelayCommand(SortPayments);
             Globals._mailClient.MailFinished += _mailClient_MailFinished;
+            CsvReader.CsvFinished += _mailClient_MailFinished;
         }
                 
         public ObservableCollection<Payment> Payments { get; set; }
