@@ -96,12 +96,12 @@ namespace ExpanseWatcher
             int i = 0;
             foreach (var payment in newPayments)
             {
-                if (currentPayments.Any(curPay => curPay.TransactionCode == payment.TransactionCode))
+                if (currentPayments.Any(curPay => curPay.Equals(payment)))
                 {
                     Logging.Log.Info($"payment is already in database: {payment.Price}€, {payment.Shop}, {payment.DateOfPayment.ToString("yyyy-MM-dd HH:mm:ss")}");
                     continue;
                 }
-                while (currentPayments.Any(curPay => curPay.Equals(payment)))
+                while (currentPayments.Any(curPay => curPay.DateOfPayment == payment.DateOfPayment))
                 {
                     payment.DateOfPayment = payment.DateOfPayment.AddMinutes(1);
                 }
