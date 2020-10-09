@@ -151,6 +151,11 @@ namespace ExpanseWatcher
                     Logging.Log.Info($"payment is already in database: {payment.Price}€, {payment.Shop}, {payment.DateOfPayment.ToString("yyyy-MM-dd HH:mm:ss")}");
                     continue;
                 }
+                while (currentPayments.Any(curPay => curPay.DateOfPayment == payment.DateOfPayment))
+                {
+                    payment.DateOfPayment = payment.DateOfPayment.AddMinutes(1);
+                }
+                currentPayments.Add(payment);
                 DataBaseHelper.AddPaymentToDB(payment);
             }
 

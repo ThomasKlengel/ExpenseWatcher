@@ -30,7 +30,7 @@
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding Shop}" Header="Shop" Width="200"/>
                     <GridViewColumn DisplayMemberBinding="{Binding Price, ConverterCulture='de-DE' , StringFormat= {}{0:C}}" Header="Price" Width="Auto"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding DateOfPayment, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Header="Date" Width="Auto"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding DateOfPayment, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" Header="Date" Width="Auto"/>
                     <GridViewColumn DisplayMemberBinding="{Binding TransactionCode}" Header="Transaction" Width="Auto"/>
                     <GridViewColumn DisplayMemberBinding="{Binding AuthorizationCode}" Header="Authorization" Width="Auto"/>
                 </GridView>
