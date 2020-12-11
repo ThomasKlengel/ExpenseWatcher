@@ -119,13 +119,13 @@ namespace ExpanseWatcher
                 double.TryParse(priceText, out double price);
 
                 // get transaction and authorization
-                Regex transaktion = new Regex("Transaktionscode:\\s*([\\r\\n]|)\\s*(\\w{17})");
-                Regex autorisierung = new Regex("Autorisierungscode:\\s*([\\r\\n]|)\\s*(\\w{6})");
+                Regex transaktion = new Regex("Transaktionscode:{0,1}\\s*(\\w{17})");
+                Regex autorisierung = new Regex("Autorisierungscode:{0,1}\\s*(\\w{6})");
                 var tmatch = transaktion.Match(email.Body);
                 string trans = "";
                 if (tmatch.Success)
                 {
-                    trans = tmatch.Groups[2].Value;
+                    trans = tmatch.Groups[1].Value;
                 }
                 else
                 {
@@ -135,7 +135,7 @@ namespace ExpanseWatcher
                 string auth = "";
                 if (amatch.Success)
                 {
-                    auth = amatch.Groups[2].Value;
+                    auth = amatch.Groups[1].Value;
                 }
 
                 // put data into a class
@@ -160,7 +160,7 @@ namespace ExpanseWatcher
             }
 
             RaiseMailFinished();
-            
+
             // delete the messages from the gmail folders
             mailRepository.DeleteMails(messagesToDelete, "INBOX");
             if (payPalFolder.ToUpper() != "INBOX")
