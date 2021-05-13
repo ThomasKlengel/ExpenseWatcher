@@ -25,7 +25,7 @@ namespace ExpanseWatcher.ViewModels
             // refresh payments in view
             App.Current.Dispatcher.Invoke(() =>
             {
-                lastSortAscending = true;
+                lastSortAscending = false;
                 // Sort the shares
                 Payments = SortCollection<Payment>(Globals.Payments, "DateOfPayment", lastSortAscending);
             });

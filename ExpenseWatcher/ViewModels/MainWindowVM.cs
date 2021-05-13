@@ -128,7 +128,7 @@ namespace ExpanseWatcher.ViewModels
             {
                 Globals.Payments.Clear();
                 // get payments until now from database
-                DataBaseHelper.GetPaymentsFromDB().OrderBy(p=>p.DateOfPayment).ToList().ForEach(pm => Globals.Payments.Add(pm));
+                DataBaseHelper.GetPaymentsFromDB().ToList().ForEach(pm => Globals.Payments.Add(pm));
             });
 
         }

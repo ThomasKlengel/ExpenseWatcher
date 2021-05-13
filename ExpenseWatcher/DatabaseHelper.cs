@@ -45,7 +45,7 @@ namespace ExpanseWatcher
         }
 
         /// <summary>
-        /// Gets all paments from the databse
+        /// Gets all paments from the databse, ordered descending on date of payment
         /// </summary>
         /// <param name="path">The path to the database</param>
         /// <returns></returns>
@@ -58,7 +58,7 @@ namespace ExpanseWatcher
                     // get the required tables of the database
                     con.CreateTable<Payment>();
                     // return the table as list, orderd by the ShareName
-                    return con.Table<Payment>().ToList().OrderBy((pay) => { return pay.DateOfPayment; }).ToList();
+                    return con.Table<Payment>().ToList().OrderByDescending((pay) => { return pay.DateOfPayment; }).ToList();
                 }
             }
             catch (Exception ex)
