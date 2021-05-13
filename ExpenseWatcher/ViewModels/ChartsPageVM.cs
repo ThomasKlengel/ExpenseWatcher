@@ -19,10 +19,10 @@ namespace ExpanseWatcher.ViewModels
             Start_EndDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
             End_StartDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
             End_EndDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
-            Start_SelectedDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
+            Start_SelectedDate = DateTime.Now.AddYears(-1);
             End_SelectedDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
 
-            SelectedChart = Charts.First();
+            SelectedChart = Charts.Last();
         }
         #endregion
 

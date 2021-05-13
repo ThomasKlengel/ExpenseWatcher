@@ -19,8 +19,6 @@ namespace ExpanseWatcher
         public MainWindow()
         {
             InitializeComponent();
-            //Globals.MainWindowVM = new ViewModels.MainWindowVM();
-            this.DataContext = Globals.MainWindowVM; //= new ViewModels.MainWindowVM();
         }      
 
     }
