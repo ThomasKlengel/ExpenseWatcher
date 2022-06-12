@@ -1,8 +1,8 @@
-﻿using ExpanseWatcher.ViewModels;
+﻿using ExpenseWatcher.ViewModels;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace ExpanseWatcher
+namespace ExpenseWatcher
 {
     /// <summary>
     /// static class representing application wide accessible data

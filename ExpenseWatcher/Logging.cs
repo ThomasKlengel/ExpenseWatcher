@@ -1,6 +1,6 @@
 ﻿using log4net;
 
-namespace ExpanseWatcher
+namespace ExpenseWatcher
 {
     public static class Logging
     {

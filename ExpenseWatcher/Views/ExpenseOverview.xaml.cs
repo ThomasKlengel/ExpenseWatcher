@@ -1,5 +1,5 @@
 ﻿using System.Windows.Controls;
-namespace ExpanseWatcher.Views
+namespace ExpenseWatcher.Views
 {
     /// <summary>
     /// Interaktionslogik für NameReplacements.xaml

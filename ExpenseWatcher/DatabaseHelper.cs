@@ -1,10 +1,10 @@
-﻿using ExpanseWatcher.ViewModels;
+﻿using ExpenseWatcher.ViewModels;
 using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ExpanseWatcher
+namespace ExpenseWatcher
 {
     /// <summary>
     /// A helper class for SQlite database handling.

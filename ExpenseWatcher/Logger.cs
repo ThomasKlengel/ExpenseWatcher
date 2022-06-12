@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using System.IO;
 
-namespace ExpanseWatcher
+namespace ExpenseWatcher
 {
     /// <summary>
     /// class reperesenting a logger 

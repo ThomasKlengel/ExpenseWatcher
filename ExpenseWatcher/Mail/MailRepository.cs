@@ -8,7 +8,7 @@ using System.Globalization;
 /// https://tools.ietf.org/html/rfc3501#page-51
 /// </remarks>
 
-namespace ExpanseWatcher
+namespace ExpenseWatcher
 {
     /// <summary>
     /// Class handling access to a IMAP Mailserver

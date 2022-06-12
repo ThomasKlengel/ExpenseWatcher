@@ -9,7 +9,7 @@ using System.Xml.Linq;
 using System.Linq;
 using System.Windows.Controls;
 
-namespace ExpanseWatcher
+namespace ExpenseWatcher
 {
     /// <summary>
     /// Interaktionslogik für MainWindow.xaml

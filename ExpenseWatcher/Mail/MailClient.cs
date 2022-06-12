@@ -10,7 +10,7 @@ using System.Xml.Linq;
 /// https://tools.ietf.org/html/rfc3501#page-51
 /// </remarks>
 
-namespace ExpanseWatcher
+namespace ExpenseWatcher
 {
     public class MailClient
     {

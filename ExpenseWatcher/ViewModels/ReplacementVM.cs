@@ -1,7 +1,7 @@
 ﻿using SQLite;
 using ViewModel;
 
-namespace ExpanseWatcher.ViewModels
+namespace ExpenseWatcher.ViewModels
 {
     /// <summary>
     /// class representing the view model for a single company name that is to be replaced by a shorter name

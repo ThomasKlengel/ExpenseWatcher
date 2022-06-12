@@ -4,7 +4,7 @@ using System.Timers;
 using System.Windows.Controls;
 using ViewModel;
 
-namespace ExpanseWatcher.ViewModels
+namespace ExpenseWatcher.ViewModels
 {
     //TODO: add class summaries
     class MainWindowVM : BaseViewModel

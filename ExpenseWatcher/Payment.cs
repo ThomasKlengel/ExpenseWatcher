@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ExpanseWatcher
+namespace ExpenseWatcher
 {
     /// <summary>
     /// A class representing a payment via PayPal

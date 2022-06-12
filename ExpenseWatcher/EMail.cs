@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ExpanseWatcher
+namespace ExpenseWatcher
 {
     /// <summary>
     /// Class representing the core components of an Email needed for this app

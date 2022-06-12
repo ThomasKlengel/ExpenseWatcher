@@ -1,10 +1,10 @@
-﻿<Page x:Class="ExpanseWatcher.Views.ChartsPage"
+﻿<Page x:Class="ExpenseWatcher.Views.ChartsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:ExpanseWatcher.Views"
-      xmlns:view="clr-namespace:ExpanseWatcher.ViewModels"
+      xmlns:local="clr-namespace:ExpenseWatcher.Views"
+      xmlns:view="clr-namespace:ExpenseWatcher.ViewModels"
       xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"      
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
@@ -20,7 +20,7 @@
         <StackPanel Orientation="Vertical" Grid.Row="0">
             <ComboBox ItemsSource="{Binding Charts}" SelectedItem="{Binding SelectedChart}" Margin="5"/>
             <StackPanel Orientation="Horizontal" Margin="5">
-                <Label>StartDate</Label>
+                <Label>StartDate</Label> 
                 <DatePicker SelectedDateFormat="Short" SelectedDate="{Binding Start_SelectedDate}"
                   DisplayDateStart="{Binding Start_StartDate}" DisplayDateEnd="{Binding Start_EndDate}" 
                   FirstDayOfWeek="Monday"/>
@@ -38,7 +38,7 @@
                     <lvc:Axis Title="Week" LabelFormatter="{Binding XDateFormat}"></lvc:Axis>
                 </lvc:CartesianChart.AxisX>
                 <lvc:CartesianChart.AxisY>
-                    <lvc:Axis LabelFormatter="{Binding YEuroFormat}" MinValue="{Binding YMin}" MaxValue="{Binding YMax}"/>
+                    <lvc:Axis LabelFormatter="{Binding YEuroFormat}" MinValue="{Binding YMin}" MaxValue="{Binding YMax}" ></lvc:Axis>
                 </lvc:CartesianChart.AxisY>
             </lvc:CartesianChart>
             <lvc:CartesianChart LegendLocation="Bottom" Hoverable="False" Series="{Binding StackedAreaSeries}" Visibility="{Binding StackedAreaVisible}">
@@ -46,7 +46,7 @@
                     <lvc:Axis Title="Date" LabelFormatter="{Binding XDateFormat}"></lvc:Axis>
                 </lvc:CartesianChart.AxisX>
                 <lvc:CartesianChart.AxisY>
-                    <lvc:Axis LabelFormatter="{Binding YEuroFormat}" MinValue="{Binding YMin}" MaxValue="{Binding YMax}" />
+                    <lvc:Axis LabelFormatter="{Binding YEuroFormat}" MinValue="{Binding YMin}" MaxValue="{Binding YMax}" ></lvc:Axis>
                 </lvc:CartesianChart.AxisY>
             </lvc:CartesianChart>
         </Grid>

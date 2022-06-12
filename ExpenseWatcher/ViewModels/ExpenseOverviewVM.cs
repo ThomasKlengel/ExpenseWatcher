@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using ViewModel;
 
-namespace ExpanseWatcher.ViewModels
+namespace ExpenseWatcher.ViewModels
 {
     public class ExpenseOverviewVM: BaseViewModel
     {      
@@ -23,7 +23,7 @@ namespace ExpanseWatcher.ViewModels
         private void _mailClient_MailFinished()
         {
             // refresh payments in view
-            App.Current?.Dispatcher.Invoke(() =>
+            App.Current.Dispatcher.Invoke(() =>
             {
                 lastSortAscending = false;
                 // Sort the shares

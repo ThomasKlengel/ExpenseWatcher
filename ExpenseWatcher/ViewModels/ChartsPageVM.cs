@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using LiveCharts.Defaults;
 
-namespace ExpanseWatcher.ViewModels
+namespace ExpenseWatcher.ViewModels
 {
     class ChartsPageVM : BaseViewModel
     {
@@ -19,10 +19,10 @@ namespace ExpanseWatcher.ViewModels
             Start_EndDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
             End_StartDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
             End_EndDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
-            Start_SelectedDate = DateTime.Now.AddYears(-1);
+            Start_SelectedDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
             End_SelectedDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
 
-            SelectedChart = Charts.Last();
+            SelectedChart = Charts.First();
         }
         #endregion
 

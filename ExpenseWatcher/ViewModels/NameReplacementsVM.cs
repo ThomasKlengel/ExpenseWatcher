@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ViewModel;
 
-namespace ExpanseWatcher.ViewModels
+namespace ExpenseWatcher.ViewModels
 {
     /// <summary>
     /// class representing the view model for a list of company names that are to be replaced by shorter names
@@ -30,7 +30,7 @@ namespace ExpanseWatcher.ViewModels
         {
             Replacements = new ObservableCollection<ReplacementVM>();
             // get current replacements from list and fill the collection
-            foreach (var rep in ExpanseWatcher.DataBaseHelper.GetReplacementsFromDB())
+            foreach (var rep in ExpenseWatcher.DataBaseHelper.GetReplacementsFromDB())
             {
                 if (!Replacements.Any(repl => repl.Original == rep.Original))
                 {
@@ -57,7 +57,7 @@ namespace ExpanseWatcher.ViewModels
         {
             foreach (var replacement in Replacements)
             {
-                ExpanseWatcher.DataBaseHelper.AddReplacementToDB(replacement);
+                ExpenseWatcher.DataBaseHelper.AddReplacementToDB(replacement);
             }
         }
     }

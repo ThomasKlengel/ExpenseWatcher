@@ -3,7 +3,7 @@ using SQLite;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace ExpanseWatcher
+namespace ExpenseWatcher
 {
     /// <summary>
     /// class representing a category of <see cref="Payment"/>s (e.g. groceries, car)
