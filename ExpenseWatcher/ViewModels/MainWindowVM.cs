@@ -104,7 +104,7 @@ namespace ExpenseWatcher.ViewModels
         private void ShowCharts(object o) { DisplayPage = new Views.ChartsPage(); Save(); }
         private void ShowSettings(object o) { DisplayPage = new Views.SettingsPage(); Save(); }
 
-        private void ReadCsv (object o) { CsvReader.ReadFromFile(); }
+        private void ReadCsv (object o) { DisplayPage = new Views.ReadCsvPage();/*CsvReader.ReadFromFile();*/ }
 
         #endregion
 
