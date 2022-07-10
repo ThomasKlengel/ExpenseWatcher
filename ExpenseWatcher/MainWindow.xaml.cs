@@ -20,6 +20,5 @@ namespace ExpenseWatcher
         {
             InitializeComponent();
         }      
-
     }
 }

@@ -2,6 +2,7 @@
 using SQLite;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace ExpenseWatcher
@@ -51,21 +52,29 @@ namespace ExpenseWatcher
         /// <returns></returns>
         public static List<Payment> GetPaymentsFromDB(string path = DEFAULTPATH)
         {
-            try
-            {   // connect to the database
-                using (SQLiteConnection con = new SQLiteConnection(path))
+            var p1 = Path.GetFileNameWithoutExtension(path);
+            var DBpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, p1);
+            var complete = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path);
+            if (File.Exists(complete))
+            {
+                try
                 {
-                    // get the required tables of the database
-                    con.CreateTable<Payment>();
-                    // return the table as list, orderd by the ShareName
-                    return con.Table<Payment>().ToList().OrderByDescending((pay) => { return pay.DateOfPayment; }).ToList();
+                    // connect to the database
+                    using (SQLiteConnection con = new SQLiteConnection(path))
+                    {
+                        // get the required tables of the database
+                        con.CreateTable<Payment>();
+                        // return the table as list, orderd by the ShareName
+                        return con.Table<Payment>().ToList().OrderByDescending((pay) => { return pay.DateOfPayment; }).ToList();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("GetPaymentsFromDB : " + ex+"\r\n"+ex.InnerException);
+                    new List<Payment> { };
                 }
             }
-            catch (Exception ex)
-            {
-                Logger.Log("GetPaymentsFromDB : " + ex);
-                return null;
-            }
+            return new List<Payment> { };
         }
         #endregion
 
@@ -153,7 +162,7 @@ namespace ExpenseWatcher
             catch (Exception ex)
             {
                 Logger.Log("GetReplacementsFromDB : " + ex);
-                return null;
+                return new List<ReplacementVM>();
             }
         }
         #endregion
@@ -247,7 +256,7 @@ namespace ExpenseWatcher
             catch (Exception ex)
             {
                 Logger.Log("GetReplacementsFromDB : " + ex);
-                return null;
+                return new List<Category>();
             }
         }
         #endregion
@@ -273,7 +282,7 @@ namespace ExpenseWatcher
             catch (Exception ex)
             {
                 Logger.Log("GetSettingsFromDB : " + ex);
-                return null;
+                return new List<Setting>();
             }
         }
 
@@ -305,7 +314,7 @@ namespace ExpenseWatcher
                 Logger.Log("AddSettingToDB : " + ex);
                 return -1;
             }
-        } 
+        }
         #endregion
     }
 }
