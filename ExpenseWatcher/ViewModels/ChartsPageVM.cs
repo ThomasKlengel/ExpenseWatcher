@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ViewModel;
@@ -7,6 +7,7 @@ using LiveCharts.Wpf;
 using System.Collections.ObjectModel;
 using System.Windows;
 using LiveCharts.Defaults;
+using System.ComponentModel;
 
 namespace ExpenseWatcher.ViewModels
 {
@@ -15,12 +16,18 @@ namespace ExpenseWatcher.ViewModels
         #region Constructors
         public ChartsPageVM()
         {
-            Start_StartDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
-            Start_EndDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
-            End_StartDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
-            End_EndDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
-            Start_SelectedDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
-            End_SelectedDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
+            if (Globals.Payments.Count > 0)
+            {
+                var minDate = Globals.Payments.OrderBy(p => p.DateOfPayment).FirstOrDefault().DateOfPayment.DateTime;
+                var maxDate = Globals.Payments.OrderBy(p => p.DateOfPayment).LastOrDefault().DateOfPayment.DateTime;
+
+                Start_StartDate = minDate;
+                Start_EndDate = maxDate;
+                End_StartDate = minDate;
+                End_EndDate = maxDate;
+                Start_SelectedDate = DateTime.Now.Date.AddMonths(-3);
+                End_SelectedDate = DateTime.Now.Date;
+            }
 
             SelectedChart = Charts.First();
         }
@@ -38,11 +45,11 @@ namespace ExpenseWatcher.ViewModels
                 if (_selectedChart != value)
                 {
                     _selectedChart = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged(nameof(PieVisible));
-                    NotifyPropertyChanged(nameof(StackedLineVisible));
-                    NotifyPropertyChanged(nameof(StackedAreaVisible));
-                    NotifyPropertyChanged(nameof(Series));
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(PieVisible));
+                    OnPropertyChanged(nameof(StackedLineVisible));
+                    OnPropertyChanged(nameof(StackedAreaVisible));
+                    OnPropertyChanged(nameof(Series));
                 }
             }
         }
@@ -57,7 +64,7 @@ namespace ExpenseWatcher.ViewModels
                 if (_start_StartDate != value)
                 {
                     _start_StartDate = value;
-                    NotifyPropertyChanged();
+                    OnPropertyChanged();
                 }
             }
         }
@@ -71,7 +78,7 @@ namespace ExpenseWatcher.ViewModels
                 if (_start_EndDate != value)
                 {
                     _start_EndDate = value;
-                    NotifyPropertyChanged();
+                    OnPropertyChanged();
                 }
             }
         }
@@ -85,7 +92,7 @@ namespace ExpenseWatcher.ViewModels
                 if (_end_StartDate != value)
                 {
                     _end_StartDate = value;
-                    NotifyPropertyChanged();
+                    OnPropertyChanged();
                 }
             }
         }
@@ -99,7 +106,7 @@ namespace ExpenseWatcher.ViewModels
                 if (_end_EndDate != value)
                 {
                     _end_EndDate = value;
-                    NotifyPropertyChanged();
+                    OnPropertyChanged();
                 }
             }
         }
@@ -113,10 +120,10 @@ namespace ExpenseWatcher.ViewModels
                 if (_start_SelectedDate != value)
                 {
                     _start_SelectedDate = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged(nameof(PieSeries));
-                    NotifyPropertyChanged(nameof(StackedAreaSeries));
-                    NotifyPropertyChanged(nameof(StackedLineSeries));
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(PieSeries));
+                    OnPropertyChanged(nameof(StackedAreaSeries));
+                    OnPropertyChanged(nameof(StackedLineSeries));
                 }
             }
         }
@@ -130,10 +137,10 @@ namespace ExpenseWatcher.ViewModels
                 if (_end_SelectedDate != value)
                 {
                     _end_SelectedDate = value.AddHours(23).AddMinutes(59).AddSeconds(59);
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged(nameof(PieSeries));
-                    NotifyPropertyChanged(nameof(StackedAreaSeries));
-                    NotifyPropertyChanged(nameof(StackedLineSeries));
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(PieSeries));
+                    OnPropertyChanged(nameof(StackedAreaSeries));
+                    OnPropertyChanged(nameof(StackedLineSeries));
                 }
             }
         }
@@ -156,15 +163,22 @@ namespace ExpenseWatcher.ViewModels
                 List<Category> categories = new List<Category>();
                 foreach (var p in localPayments)
                 {
-                    var category = Globals.Categories.Where(c => c.AttachedShops.Contains(p.Shop)).FirstOrDefault();
+                    if (p.Price > 0)
+                    {
+                        continue;
+                    }
+
+                    var category = Globals.Categories.FirstOrDefault(c => c.AttachedShops.Contains(p.Shop));
                     if (category == null)
                     {
                         category = new Category("Others");
                     }
+
                     if (!categories.Any(c => c.Name == category.Name))
                     {
                         categories.Add(category);
                     }
+
                     if (category.Name == "Others")
                     {
                         var othersCategory = categories.Find(c => c.Name == "Others");
@@ -174,7 +188,10 @@ namespace ExpenseWatcher.ViewModels
                         }
                     }
                 }
-                return categories;
+
+                return categories
+                    .Where(c => !string.Equals(c.Name, "Einkommen", StringComparison.OrdinalIgnoreCase))
+                    .ToList();
             }
         }
 
@@ -209,12 +226,14 @@ namespace ExpenseWatcher.ViewModels
                     var sumPrice = 0.0;
                     foreach (var shop in cat.AttachedShops)
                     {
-                        localPayments.Where(p => p.Shop == shop).ToList().ForEach(p => { sumPrice += p.Price; });
+                        localPayments.Where(p => p.Shop == shop)
+                            .Where(p=>p.Price < 0)
+                            .ToList().ForEach(p => { sumPrice += Math.Abs(p.Price); });
                     }
                     // add data to series collection
                     series.Values = new ChartValues<Double>() { sumPrice };
                     series.LabelPoint = chartPoint =>
-                    string.Format($"{cat.Name} {chartPoint.Y}€ ({chartPoint.Participation:P})");
+                    string.Format($"{cat.Name} {chartPoint.Y:0.##}€ ({chartPoint.Participation:P})");
                     series.DataLabels = true;
                     col.Add(series);
                 }
@@ -249,10 +268,11 @@ namespace ExpenseWatcher.ViewModels
                         var sumX = 0.0;
                         foreach (var shop in cat.AttachedShops)
                         {
-                            localPayments.Where(p => p.Shop == shop
-                                && p.DateOfPayment > DateTimeOffset.Now.AddDays((-i - 1) * 7)
-                                && p.DateOfPayment < DateTimeOffset.Now.AddDays(-i * 7))
-                                .ToList().ForEach(p => { sumX += p.Price; });
+                            localPayments.Where(p => p.Shop == shop)
+                                .Where(p => p.Price < 0)
+                                .Where(p => p.DateOfPayment > DateTimeOffset.Now.AddDays((-i - 1) * 7))
+                                .Where(p => p.DateOfPayment < DateTimeOffset.Now.AddDays(-i * 7))
+                                .ToList().ForEach(p => { sumX += Math.Abs(p.Price); });
                         }
                         sumPrices.Add(sumX);
                     }
@@ -260,7 +280,7 @@ namespace ExpenseWatcher.ViewModels
                     series.Values = new ChartValues<Double>();
                     series.Values.AddRange(sumPrices);
                     series.LabelPoint = chartPoint =>
-                    string.Format($"{chartPoint.Y}€");
+                    string.Format($"{chartPoint.Y:0.##}€");
                     series.DataLabels = true;
                     col.Add(series);
                 }
@@ -292,19 +312,20 @@ namespace ExpenseWatcher.ViewModels
                         localPayments
                             .Where(p => p.Shop == shop)
                             .OrderBy(p => p.DateOfPayment)
-                            .ToList().ForEach(p =>
+                            .ToList().Where(p => p.Price < 0).ToList().ForEach(p =>
                             {
                                 var dt = new DateTime(p.DateOfPayment.Ticks);
                                 sumPrices.Where(sum => sum.DateTime == dt)
-                                .FirstOrDefault().Value = p.Price;
+                                .FirstOrDefault().Value = Math.Abs(p.Price);
                                 //payInCat.Add(p);
                             });
                     }
 
                     // sum up the price with the previous one, so we get an ascending sum
+                    
                     for (int i = 1; i < sumPrices.Count; i++)
                     {
-                        sumPrices[i].Value += sumPrices[i - 1].Value;
+                        sumPrices[i].Value += Math.Abs(sumPrices[i - 1].Value);
                     }
 
                     // add data to series collection
@@ -335,7 +356,7 @@ namespace ExpenseWatcher.ViewModels
         {
             get
             {
-                return val => val.ToString("N0") + "€";
+                return val => val.ToString("0.##") + "€";
             }
         }
         #endregion
