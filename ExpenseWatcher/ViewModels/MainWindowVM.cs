@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
@@ -20,6 +21,7 @@ namespace ExpenseWatcher.ViewModels
         public MainWindowVM()
         {
             Logging.Log.Info("initializing...");
+            //DataBaseHelper.AddShop();
 
             Globals._mailClient.MailFinished += _mailClient_MailFinished;
             CsvReader.CsvFinished += _mailClient_MailFinished;
@@ -31,15 +33,36 @@ namespace ExpenseWatcher.ViewModels
             DataBaseHelper.GetPaymentsFromDB().ForEach(pm => Globals.Payments.Add(pm));
             Logging.Log.Info($"found {Globals.Payments.Count} payments");
 
+            //List<Payment> pms = new List<Payment>();
+            //DataBaseHelper.GetPaymentsFromDB().ForEach(pm => pms.Add(pm));
+            //pms.ForEach(pm =>
+            //{
+            //    if (pm.Price > 0)
+            //    {
+            //        pm.Price = -pm.Price;
+            //    }
+            //});
+            //pms.ForEach(pm=> DataBaseHelper.UpdatePaymentInDB(pm));
+
             // get replacements until now from database
-            DataBaseHelper.GetReplacementsFromDB().ForEach(rep => Globals.Replacements.Add(rep));
+            //DataBaseHelper.GetReplacementsFromDB().ForEach(rep => Globals.Replacements.Add(rep));
 
             // get categories until now from database
             Logging.Log.Info("getting categories from database");
             DataBaseHelper.GetCategoriesFromDB().ForEach(cat => Globals.Categories.Add(cat));
+            if (!Globals.Categories.Any(cat => cat.Name == "Einkommen"))
+            {
+                Globals.Categories.Add(new Category("Einkommen"));
+            }
             Logging.Log.Info($"found {Globals.Categories.Count} categories");
 
             // get settings from database
+
+
+            // get settings from database
+
+
+
             DataBaseHelper.GetSettingsFromDB().ForEach(set => Globals.Settings.Add(set));
 
             // initialize default settings
@@ -63,7 +86,7 @@ namespace ExpenseWatcher.ViewModels
 
             Task.Run(() =>
             {
-                Globals._mailClient.ReadImap();
+                Globals._mailClient.ReadPayPal();
             });
         } 
         #endregion
@@ -84,7 +107,7 @@ namespace ExpenseWatcher.ViewModels
                 if (_displayPage != value)
                 {
                     _displayPage = value;
-                    NotifyPropertyChanged();
+                    OnPropertyChanged();
                 }
             }
         } 
@@ -113,7 +136,7 @@ namespace ExpenseWatcher.ViewModels
         {
             Task.Run(() =>
             {
-                DataBaseHelper.SaveReplacementsToDB();
+                //DataBaseHelper.SaveReplacementsToDB();
                 DataBaseHelper.SaveCategoriesToDB();
                 DataBaseHelper.SaveSettingsToDB();
             });
@@ -143,7 +166,7 @@ namespace ExpenseWatcher.ViewModels
             // read mails in seperate task
             Task.Run(() =>
             {
-                Globals._mailClient.ReadImap();
+                Globals._mailClient.ReadPayPal();
             });
         } 
         #endregion

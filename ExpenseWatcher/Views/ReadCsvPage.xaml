@@ -14,30 +14,58 @@
     </Page.DataContext>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
+        <Grid.Resources>
+            <DataTemplate x:Key="HeaderTemplate">
+                <StackPanel Orientation="Vertical">
+                    <ComboBox SelectedIndex="{Binding SetHeader}">
+                        <ComboBoxItem Name="None"                Content="None"                />
+                        <ComboBoxItem Name="Date"                Content="Date"                />
+                        <ComboBoxItem Name="Time"                Content="Time"                 />
+                        <ComboBoxItem Name="Amount"              Content="Amount"               />
+                        <ComboBoxItem Name="Currency"            Content="Currency"             />
+                        <ComboBoxItem Name="Recipient"           Content="Recipient"            />
+                        <ComboBoxItem Name="TransactionID"       Content="TransactionID"            />
+                        <ComboBoxItem Name="ReceivedTransaction" Content="ReceivedTransaction"    />
+                    </ComboBox>
+                    <TextBlock Text="{Binding HeaderFromFile}"/>
+                </StackPanel>
+            </DataTemplate>
+        </Grid.Resources>
         <Button Content="Read CSV" Command="{Binding ReadCsvPartCommand}" Grid.Row="0"/>
         <TextBlock Text="{Binding FirstLines}" Grid.Row="1"/>
-        <!--<ListView HorizontalAlignment="Left"  VerticalAlignment="Top"  ItemsSource="{Binding Payments}" Grid.Column="0" Margin="5">
-            <ListView.Resources>
-                --><!--create style to sort rows on column header click-->
-                <!--(columnheaders a buttons by default)--><!--
-                <Style TargetType="{x:Type GridViewColumnHeader}">
-                    <Setter Property="Command" Value="{Binding SortCommand}"/>
-                    <Setter Property="CommandParameter" Value="{Binding RelativeSource = {RelativeSource Self}}"/>
-                </Style>
-            </ListView.Resources>            
+        <ListView ItemsSource="{Binding Rows }" Grid.Row="2">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn DisplayMemberBinding="{Binding Shop}" Header="Shop" Width="200"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding Price, ConverterCulture='de-DE' , StringFormat= {}{0:C}}" Header="Price" Width="Auto"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding DateOfPayment, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" Header="Date" Width="Auto"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding TransactionCode}" Header="Transaction" Width="Auto"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding AuthorizationCode}" Header="Authorization" Width="Auto"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[0]}"  Header="{Binding Path=Headers[0]}"  HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[1]}"  Header="{Binding Path=Headers[1]}"  HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[2]}"  Header="{Binding Path=Headers[2]}"  HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[3]}"  Header="{Binding Path=Headers[3]}"  HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[4]}"  Header="{Binding Path=Headers[4]}"  HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[5]}"  Header="{Binding Path=Headers[5]}"  HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[6]}"  Header="{Binding Path=Headers[6]}"  HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[7]}"  Header="{Binding Path=Headers[7]}"  HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[8]}"  Header="{Binding Path=Headers[8]}"  HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[9]}"  Header="{Binding Path=Headers[9]}"  HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[10]}" Header="{Binding Path=Headers[10]}" HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[11]}" Header="{Binding Path=Headers[11]}" HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[12]}" Header="{Binding Path=Headers[12]}" HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[13]}" Header="{Binding Path=Headers[13]}" HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[14]}" Header="{Binding Path=Headers[14]}" HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[15]}" Header="{Binding Path=Headers[15]}" HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[16]}" Header="{Binding Path=Headers[16]}" HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[17]}" Header="{Binding Path=Headers[17]}" HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[18]}" Header="{Binding Path=Headers[18]}" HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Items[19]}" Header="{Binding Path=Headers[19]}" HeaderTemplate="{StaticResource HeaderTemplate}" Width="80"/>
                 </GridView>
             </ListView.View>
-        </ListView>-->        
+        </ListView>
+        <StackPanel Orientation="Horizontal" Grid.Row="3">
+            <Button Content="Confirm" Command="{Binding ConfirmCommand}"/>
+        </StackPanel>
     </Grid>
 </Page>

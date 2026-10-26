@@ -1,4 +1,4 @@
-﻿using SQLite;
+﻿using sqla = SqliteAccessForExpenseWatcher;
 
 namespace ExpenseWatcher
 {
@@ -11,7 +11,6 @@ namespace ExpenseWatcher
         /// <summary>
         /// The name of the setting
         /// </summary>
-        [PrimaryKey]
         public string Name { get; set; }
 
         /// <summary>
@@ -41,7 +40,34 @@ namespace ExpenseWatcher
         {
             Name = name;
             Value = value;
-        }     
+        }
         #endregion
+
+        /// <summary>
+        /// Converts a <see cref="Setting"/> to a <see cref="sqla.Setting"/> data base object.
+        /// </summary>
+        /// <returns>The converted <see cref="sqla.Setting"/> DBO.</returns>
+        public sqla.Setting ConvertToDbo()
+        {
+            return new sqla.Setting()
+            {
+                Value = this.Value,
+                Name = this.Name,
+            };
+        }
+
+        /// <summary>
+        /// Creates a new instance of a <see cref="Setting"/> from a <see cref="sqla.Setting"/> data base object.
+        /// </summary>
+        /// <param name="settingDBO">The <see cref="sqla.Setting"/> that is used to create the creat the <see cref="Setting"/>.</param>
+        /// <returns>The resulting <see cref="Setting"/>.</returns>
+        public static Setting CreateFromDbo(sqla.Setting settingDBO)
+        {
+            return new Setting()
+            {
+                Value = settingDBO.Value,
+                Name = settingDBO.Name,
+            };
+        }
     }
 }

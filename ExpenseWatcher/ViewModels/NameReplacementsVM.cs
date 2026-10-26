@@ -30,13 +30,13 @@ namespace ExpenseWatcher.ViewModels
         {
             Replacements = new ObservableCollection<ReplacementVM>();
             // get current replacements from list and fill the collection
-            foreach (var rep in ExpenseWatcher.DataBaseHelper.GetReplacementsFromDB())
-            {
-                if (!Replacements.Any(repl => repl.Original == rep.Original))
-                {
-                    Replacements.Add(rep);
-                }
-            }
+            //foreach (var rep in ExpenseWatcher.DataBaseHelper.GetReplacementsFromDB())
+            //{
+            //    if (!Replacements.Any(repl => repl.Original == rep.Original))
+            //    {
+            //        Replacements.Add(rep);
+            //    }
+            //}
             DataBaseHelper.GetPaymentsFromDB().Select(pay => pay.Shop).Distinct().ToList()
                 .ForEach((pm) =>
                 {
@@ -55,10 +55,10 @@ namespace ExpenseWatcher.ViewModels
         /// <param name="o">a dummy object</param>
         private void Apply(object o)
         {
-            foreach (var replacement in Replacements)
-            {
-                ExpenseWatcher.DataBaseHelper.AddReplacementToDB(replacement);
-            }
+            //foreach (var replacement in Replacements)
+            //{
+            //    ExpenseWatcher.DataBaseHelper.AddReplacementToDB(replacement);
+            //}
         }
     }
 }

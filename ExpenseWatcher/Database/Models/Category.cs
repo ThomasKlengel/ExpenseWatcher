@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
-using SQLite;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using sqla = SqliteAccessForExpenseWatcher;
 
 namespace ExpenseWatcher
 {
@@ -14,10 +14,9 @@ namespace ExpenseWatcher
         /// <summary>
         /// The name of the category
         /// </summary>
-        [PrimaryKey]
+
         public string Name { get; set; }
 
-        [Ignore]
         /// <summary>
         /// A list of shops thats <see cref="Payment"/>s are contained in the category
         /// </summary>
@@ -81,5 +80,32 @@ namespace ExpenseWatcher
             AttachedShops = JsonConvert.DeserializeObject<ObservableCollection<string>>(attachedShopsJson);
         }
         #endregion
+
+        /// <summary>
+        /// Converts a <see cref="Category"/> to a <see cref="sqla.Category"/> data base object.
+        /// </summary>
+        /// <returns>The converted <see cref="sqla.Category"/> DBO.</returns>
+        public sqla.Category ConvertToDbo()
+        {
+            return new sqla.Category()
+            {
+                AttachedShopsJson = this.AttachedShopsJson,
+                Name = this.Name,
+            };
+        }
+
+        /// <summary>
+        /// Creates a new instance of a <see cref="Category"/> from a <see cref="sqla.Category"/> data base object.
+        /// </summary>
+        /// <param name="categoryDBO">The <see cref="sqla.Category"/> that is used to create the creat the <see cref="Category"/>.</param>
+        /// <returns>The resulting <see cref="Category"/>.</returns>
+        public static Category CreateFromDbo(sqla.Category categoryDBO)
+        {
+            return new Category()
+            {
+                AttachedShopsJson = categoryDBO.AttachedShopsJson,
+                Name = categoryDBO.Name,
+            };
+        }
     }
 }

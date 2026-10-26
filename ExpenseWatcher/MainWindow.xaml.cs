@@ -1,5 +1,4 @@
-﻿using ActiveUp.Net.Mail;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -18,7 +17,7 @@ namespace ExpenseWatcher
     {
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }      
     }
 }

@@ -1,4 +1,4 @@
-﻿using SQLite;
+﻿//using SQLite;
 using ViewModel;
 
 namespace ExpenseWatcher.ViewModels
@@ -12,7 +12,7 @@ namespace ExpenseWatcher.ViewModels
         /// The original name that is to be replaced
         /// </summary>
         private string _original;
-        [PrimaryKey]
+        //[PrimaryKey]
         public string Original
         {
             get { return _original; }
@@ -21,7 +21,7 @@ namespace ExpenseWatcher.ViewModels
                 if (_original != value)
                 {
                     _original = value;
-                    NotifyPropertyChanged();
+                    OnPropertyChanged();
                 }
             }
         }
@@ -38,7 +38,7 @@ namespace ExpenseWatcher.ViewModels
                 if (_replaced != value)
                 {
                     _replaced = value;
-                    NotifyPropertyChanged();
+                    OnPropertyChanged();
                 }
             }
         }

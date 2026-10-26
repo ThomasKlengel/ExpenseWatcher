@@ -69,8 +69,8 @@ namespace ExpenseWatcher.ViewModels
                 {
                     _selectedCategory = value;
                     _newCategory = _selectedCategory?.Name;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged(nameof(NewCategory));
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(NewCategory));
                 }
 
             }
@@ -91,7 +91,7 @@ namespace ExpenseWatcher.ViewModels
                 if (_newCategory != value)
                 {
                     _newCategory = value;
-                    NotifyPropertyChanged();
+                    OnPropertyChanged();
                 }
             }
 
@@ -129,7 +129,7 @@ namespace ExpenseWatcher.ViewModels
                 if (_selectedAssigned != value)
                 {
                     _selectedAssigned = value;
-                    NotifyPropertyChanged();
+                    OnPropertyChanged();
                 }
 
             }
@@ -147,7 +147,7 @@ namespace ExpenseWatcher.ViewModels
                 if (_selectedUnassigned != value)
                 {
                     _selectedUnassigned = value;
-                    NotifyPropertyChanged();
+                    OnPropertyChanged();
                 }
 
             }
@@ -194,7 +194,7 @@ namespace ExpenseWatcher.ViewModels
             var cat = Globals.Categories.FirstOrDefault(c => c.Name == NewCategory);
             Globals.Categories.Remove(cat);
             NewCategory = null;
-            NotifyPropertyChanged(nameof(UnassignedShops));
+            OnPropertyChanged(nameof(UnassignedShops));
             SelectedCategory = Categories.FirstOrDefault();
         }
         /// <summary>
@@ -243,7 +243,7 @@ namespace ExpenseWatcher.ViewModels
             // add item to assigned items
             SelectedCategory.AttachedShops.Add(SelectedUnassigned);
             // remove from unassigned
-            NotifyPropertyChanged(nameof(UnassignedShops));
+            OnPropertyChanged(nameof(UnassignedShops));
             SelectedUnassigned = UnassignedShops.FirstOrDefault();
         }
         /// <summary>
@@ -274,7 +274,7 @@ namespace ExpenseWatcher.ViewModels
             //remove item from assigned
             SelectedCategory.AttachedShops.Remove(SelectedAssigned);
             SelectedAssigned = SelectedCategory.AttachedShops.FirstOrDefault();
-            NotifyPropertyChanged(nameof(UnassignedShops));
+            OnPropertyChanged(nameof(UnassignedShops));
         }
         /// <summary>
         /// Defines if an item can be unassigned

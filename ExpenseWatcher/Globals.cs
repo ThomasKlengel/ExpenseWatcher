@@ -1,4 +1,5 @@
-﻿using ExpenseWatcher.ViewModels;
+﻿using ExpenseWatcher.Mail;
+using ExpenseWatcher.ViewModels;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
