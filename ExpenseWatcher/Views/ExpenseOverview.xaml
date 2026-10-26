@@ -13,11 +13,54 @@
         <view:ExpenseOverviewVM/>
     </Page.DataContext>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <ListView HorizontalAlignment="Left"  VerticalAlignment="Top"  ItemsSource="{Binding Payments}" Grid.Column="0" Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Expander Grid.Row="0" Margin="5" IsExpanded="True" Header="Filter">
+            <Border BorderBrush="#D0D0D0" BorderThickness="1" CornerRadius="4" Padding="8" Background="#FAFAFA">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="115"/>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="115"/>
+                        <ColumnDefinition Width="115"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                        <TextBlock Text="Empfänger" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding FilterShop, UpdateSourceTrigger=PropertyChanged}" Width="100"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="0,0,8,0">
+                        <TextBlock Text="Preis" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding FilterPriceMin, UpdateSourceTrigger=PropertyChanged}" Width="136" Margin="0,0,0,4" ToolTip="Preis von"/>
+                        <TextBox Text="{Binding FilterPriceMax, UpdateSourceTrigger=PropertyChanged}" Width="136" ToolTip="Preis bis"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Margin="0,0,8,0">
+                        <TextBlock Text="Info" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding FilterInfo, UpdateSourceTrigger=PropertyChanged}" Width="100"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="3" Margin="0,0,8,0">
+                        <TextBlock Text="Kategorie" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding FilterCategory, UpdateSourceTrigger=PropertyChanged}" Width="100"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="4"
+                            Content="Zurücksetzen"
+                            Command="{Binding ClearFiltersCommand}"
+                            VerticalAlignment="Bottom"
+                            Padding="10,4"
+                            Background="#F0F0F0"/>
+                </Grid>
+            </Border>
+        </Expander>
+
+        <ListView HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding Payments}" Grid.Row="1" Margin="5">
             <ListView.Resources>
                 <!--create style to sort rows on column header click-->
                 <!--(columnheaders a buttons by default)-->
@@ -25,17 +68,18 @@
                     <Setter Property="Command" Value="{Binding SortCommand}"/>
                     <Setter Property="CommandParameter" Value="{Binding RelativeSource = {RelativeSource Self}}"/>
                 </Style>
-            </ListView.Resources>            
+            </ListView.Resources>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn DisplayMemberBinding="{Binding Shop}" Header="Shop" Width="200"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding Price, ConverterCulture='de-DE' , StringFormat= {}{0:C}}" Header="Price" Width="Auto"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding DateOfPayment, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" Header="Date" Width="Auto"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Shop}" Header="Empfänger" Width="200"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Price, ConverterCulture='de-DE' , StringFormat= {}{0:C}}" Header="Preis" Width="Auto"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding DateOfPayment, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" Header="Datum" Width="Auto"/>
                     <GridViewColumn DisplayMemberBinding="{Binding Info}" Header="Info" Width="Auto"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding TransactionCode}" Header="Transaction" Width="Auto"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding AuthorizationCode}" Header="Authorization" Width="Auto"/>                    
+                    <GridViewColumn DisplayMemberBinding="{Binding CategoryName}" Header="Kategorie" Width="150"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding TransactionCode}" Header="Transaktion" Width="Auto"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding AuthorizationCode}" Header="Genehmigung" Width="Auto"/>
                 </GridView>
             </ListView.View>
-        </ListView>        
+        </ListView>
     </Grid>
 </Page>

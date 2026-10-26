@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using sqla = SqliteAccessForExpenseWatcher;
 
 namespace ExpenseWatcher
@@ -35,6 +36,20 @@ namespace ExpenseWatcher
         public DateTimeOffset DateOfPayment { get; set; }
 
         public string Info { get; set; }
+
+        public string CategoryName
+        {
+            get
+            {
+                if (Globals.Categories == null)
+                {
+                    return string.Empty;
+                }
+
+                var category = Globals.Categories.FirstOrDefault(c => c.MatchesInfo(this) || c.MatchesShop(this));
+                return category?.Name ?? "Others";
+            }
+        }
         #endregion
 
         /// <summary>

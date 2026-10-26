@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -8,32 +9,235 @@ using ViewModel;
 namespace ExpenseWatcher.ViewModels
 {
     public class ExpenseOverviewVM: BaseViewModel
-    {      
+    {
+        private string _filterShop;
+        private string _filterPriceMin;
+        private string _filterPriceMax;
+        private string _filterInfo;
+        private string _filterCategory;
+
         public ExpenseOverviewVM()
         {
-            Payments = Globals.Payments;
+            Payments = new ObservableCollection<Payment>();
             SortCommand = new RelayCommand(SortPayments);
+            ClearFiltersCommand = new RelayCommand(_ => ClearFilters());
             Globals._mailClient.MailFinished += _mailClient_MailFinished;
             CsvReader.CsvFinished += _mailClient_MailFinished;
+            ApplyFilters();
         }
-                
+
         public ObservableCollection<Payment> Payments { get; set; }
+
+        public RelayCommand ClearFiltersCommand { get; private set; }
+
+        public void ClearFilters()
+        {
+            FilterShop = string.Empty;
+            FilterPriceMin = string.Empty;
+            FilterPriceMax = string.Empty;
+            FilterInfo = string.Empty;
+            FilterCategory = string.Empty;
+            ApplyFilters();
+        }
+
+        public string FilterShop
+        {
+            get => _filterShop;
+            set
+            {
+                if (_filterShop != value)
+                {
+                    _filterShop = value;
+                    OnPropertyChanged();
+                    ApplyFilters();
+                }
+            }
+        }
+
+        public string FilterPriceMin
+        {
+            get => _filterPriceMin;
+            set
+            {
+                if (_filterPriceMin != value)
+                {
+                    _filterPriceMin = value;
+                    OnPropertyChanged();
+                    ApplyFilters();
+                }
+            }
+        }
+
+        public string FilterPriceMax
+        {
+            get => _filterPriceMax;
+            set
+            {
+                if (_filterPriceMax != value)
+                {
+                    _filterPriceMax = value;
+                    OnPropertyChanged();
+                    ApplyFilters();
+                }
+            }
+        }
+
+        public string FilterInfo
+        {
+            get => _filterInfo;
+            set
+            {
+                if (_filterInfo != value)
+                {
+                    _filterInfo = value;
+                    OnPropertyChanged();
+                    ApplyFilters();
+                }
+            }
+        }
+
+        public string FilterCategory
+        {
+            get => _filterCategory;
+            set
+            {
+                if (_filterCategory != value)
+                {
+                    _filterCategory = value;
+                    OnPropertyChanged();
+                    ApplyFilters();
+                }
+            }
+        }
 
         #region event handlers
         private void _mailClient_MailFinished()
         {
-            // refresh payments in view
             App.Current.Dispatcher.Invoke(() =>
             {
-                lastSortAscending = false;
-                // Sort the shares
-                Payments = SortCollection<Payment>(Globals.Payments, "DateOfPayment", lastSortAscending);
+                ApplyFilters();
             });
         }
         #endregion
 
         #region Commands
         public RelayCommand SortCommand { get; private set; }
+
+        private void ApplyFilters()
+        {
+            var filteredPayments = Globals.Payments
+                .Where(payment => MatchesFilter(payment))
+                .ToList();
+
+            Payments.Clear();
+            foreach (var payment in filteredPayments)
+            {
+                Payments.Add(payment);
+            }
+
+            if (!string.IsNullOrWhiteSpace(lastSortedBy))
+            {
+                SortCollection<Payment>(Payments, lastSortedBy, lastSortAscending);
+            }
+        }
+
+        private bool MatchesFilter(Payment payment)
+        {
+            if (payment == null)
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(FilterShop) &&
+                (payment.Shop == null || payment.Shop.IndexOf(FilterShop, StringComparison.OrdinalIgnoreCase) < 0))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(FilterInfo) &&
+                (payment.Info == null || payment.Info.IndexOf(FilterInfo, StringComparison.OrdinalIgnoreCase) < 0))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(FilterCategory))
+            {
+                var categoryName = payment.CategoryName;
+                if (categoryName == null || categoryName.IndexOf(FilterCategory, StringComparison.OrdinalIgnoreCase) < 0)
+                {
+                    return false;
+                }
+            }
+
+            if (HasPriceFilter())
+            {
+                if (!MatchesPriceFilter(payment.Price, FilterPriceMin, FilterPriceMax))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool HasPriceFilter()
+        {
+            return !string.IsNullOrWhiteSpace(FilterPriceMin) || !string.IsNullOrWhiteSpace(FilterPriceMax);
+        }
+
+        private static bool MatchesPriceFilter(double priceValue, string minFilter, string maxFilter)
+        {
+            var minText = (minFilter ?? string.Empty).Trim();
+            var maxText = (maxFilter ?? string.Empty).Trim();
+
+            if (!string.IsNullOrWhiteSpace(minText) && !string.IsNullOrWhiteSpace(maxText))
+            {
+                if (double.TryParse(minText.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var minPrice) &&
+                    double.TryParse(maxText.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var maxPrice))
+                {
+                    return priceValue >= minPrice && priceValue <= maxPrice;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(minText))
+            {
+                return MatchesContainsPrice(priceValue, minText);
+            }
+
+            if (!string.IsNullOrWhiteSpace(maxText))
+            {
+                return MatchesContainsPrice(priceValue, maxText);
+            }
+
+            return true;
+        }
+
+        private static bool MatchesContainsPrice(double priceValue, string filterValue)
+        {
+            var normalizedFilter = filterValue.Trim();
+            if (string.IsNullOrWhiteSpace(normalizedFilter))
+            {
+                return true;
+            }
+
+            var priceText = Math.Abs(priceValue).ToString(CultureInfo.InvariantCulture).Replace(",", ".");
+
+            var filterText = normalizedFilter
+                .Replace(" ", string.Empty)
+                .Replace(",", ".");
+
+            if (filterText.StartsWith("-", StringComparison.Ordinal))
+            {
+                filterText = filterText.Substring(1);
+            }
+
+            if (!double.TryParse(filterText, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
+            {
+                return false;
+            }
+
+            return priceText.Contains(filterText, StringComparison.OrdinalIgnoreCase);
+        }
 
         /// <summary>
         /// The command to execute.
@@ -72,7 +276,7 @@ namespace ExpenseWatcher.ViewModels
                     }
 
                     // Sort the shares
-                    Payments = SortCollection<Payment>(Globals.Payments, headerClicked, lastSortAscending);
+                    SortCollection<Payment>(Payments, headerClicked, lastSortAscending);
 
                     // set the last sorted by for next sort
                     lastSortedBy = headerClicked;
