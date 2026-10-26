@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LiveCharts;
+using LiveCharts.Wpf;
 
 namespace ExpenseWatcher.Views
 {
@@ -23,6 +25,18 @@ namespace ExpenseWatcher.Views
         public ChartsPage()
         {
             InitializeComponent();
+        }
+
+        private void PieChart_DataClick(object sender, ChartPoint chartPoint)
+        {
+            if (chartPoint?.SeriesView is PieSeries pieSeries)
+            {
+                var vm = DataContext as ExpenseWatcher.ViewModels.ChartsPageVM;
+                if (vm != null)
+                {
+                    vm.SelectPieCategory(pieSeries.Title);
+                }
+            }
         }
     }
 }

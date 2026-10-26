@@ -12,6 +12,9 @@
     <Page.DataContext>
         <view:ChartsPageVM/>
     </Page.DataContext>
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="80"/>
@@ -32,7 +35,13 @@
             </StackPanel>
         </StackPanel>
         <Grid Grid.Row="1" Margin="5">
-            <lvc:PieChart LegendLocation="Bottom" Hoverable="False" Series="{Binding PieSeries}" Visibility="{Binding PieVisible}"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <lvc:PieChart LegendLocation="Bottom" Hoverable="False" Series="{Binding PieSeries}" Visibility="{Binding PieVisible}"
+                         DataClick="PieChart_DataClick" />
             <lvc:CartesianChart LegendLocation="Bottom" Hoverable="False" Series="{Binding StackedLineSeries}" Visibility="{Binding StackedLineVisible}">
                 <lvc:CartesianChart.AxisX>
                     <lvc:Axis Title="Week" LabelFormatter="{Binding XDateFormat}"></lvc:Axis>
@@ -49,6 +58,23 @@
                     <lvc:Axis LabelFormatter="{Binding YEuroFormat}" MinValue="{Binding YMin}" MaxValue="{Binding YMax}" ></lvc:Axis>
                 </lvc:CartesianChart.AxisY>
             </lvc:CartesianChart>
+
+            <Border Grid.Row="1" Margin="0,8,0,0" Padding="6" BorderBrush="#CCCCCC" BorderThickness="1"
+                    Background="#F9F9F9" Visibility="{Binding HasSelectedPieCategory, Converter={StaticResource BoolToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="{Binding SelectedPieCategory}" FontWeight="Bold" Margin="0,0,0,6"/>
+                    <ListView ItemsSource="{Binding SelectedCategoryPayments}" MaxHeight="220">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn DisplayMemberBinding="{Binding Shop}" Header="Shop" Width="180"/>
+                                <GridViewColumn DisplayMemberBinding="{Binding Price, ConverterCulture='de-DE', StringFormat={}{0:C}}" Header="Price" Width="Auto"/>
+                                <GridViewColumn DisplayMemberBinding="{Binding DateOfPayment, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" Header="Date" Width="Auto"/>
+                                <GridViewColumn DisplayMemberBinding="{Binding Info}" Header="Info" Width="Auto"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </StackPanel>
+            </Border>
         </Grid>
     </Grid>
 </Page>

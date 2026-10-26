@@ -36,6 +36,8 @@ namespace ExpenseWatcher.ViewModels
         #region Properties
         public ObservableCollection<string> Charts { get; set; } = new ObservableCollection<string>() { "Pie/Kuchen", "StackedLine", "StackedArea" };
 
+        public ObservableCollection<Payment> SelectedCategoryPayments { get; private set; } = new ObservableCollection<Payment>();
+
         private string _selectedChart;
         public string SelectedChart
         {
@@ -52,6 +54,81 @@ namespace ExpenseWatcher.ViewModels
                     OnPropertyChanged(nameof(Series));
                 }
             }
+        }
+
+        private string _selectedPieCategory;
+        public string SelectedPieCategory
+        {
+            get => _selectedPieCategory;
+            set
+            {
+                if (_selectedPieCategory != value)
+                {
+                    _selectedPieCategory = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(HasSelectedPieCategory));
+                    UpdateSelectedCategoryPayments();
+                }
+            }
+        }
+
+        public bool HasSelectedPieCategory => !string.IsNullOrWhiteSpace(SelectedPieCategory);
+
+        public void SelectPieCategory(string categoryName)
+        {
+            SelectedPieCategory = categoryName;
+        }
+
+        private void UpdateSelectedCategoryPayments()
+        {
+            SelectedCategoryPayments.Clear();
+
+            if (string.IsNullOrWhiteSpace(SelectedPieCategory))
+            {
+                return;
+            }
+
+            if (string.Equals(SelectedPieCategory, "Others", StringComparison.OrdinalIgnoreCase))
+            {
+                foreach (var payment in localPayments)
+                {
+                    if (payment.Price >= 0)
+                    {
+                        continue;
+                    }
+
+                    var resolvedCategory = GetCategoryForPayment(payment);
+                    if (resolvedCategory == null || string.Equals(resolvedCategory.Name, "Others", StringComparison.OrdinalIgnoreCase))
+                    {
+                        SelectedCategoryPayments.Add(payment);
+                    }
+                }
+                return;
+            }
+
+            var selectedCategory = Globals.Categories.FirstOrDefault(c => string.Equals(c.Name, SelectedPieCategory, StringComparison.OrdinalIgnoreCase));
+            if (selectedCategory == null)
+            {
+                return;
+            }
+
+            foreach (var payment in localPayments)
+            {
+                if (payment.Price >= 0)
+                {
+                    continue;
+                }
+
+                if (IsPaymentInCategory(payment, selectedCategory))
+                {
+                    SelectedCategoryPayments.Add(payment);
+                }
+            }
+        }
+
+        public void ClearPieCategorySelection()
+        {
+            SelectedPieCategory = null;
         }
 
         #region DatePicker
