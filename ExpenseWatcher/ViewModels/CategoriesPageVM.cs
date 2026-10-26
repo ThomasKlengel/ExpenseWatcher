@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +11,6 @@ namespace ExpenseWatcher.ViewModels
     {
         public CategoriesPageVM()
         {
-
             AssignItemCommand = new RelayCommand(AssignItem, CanAssignItem);
             UnassignItemCommand = new RelayCommand(UnassignItem, CanUnassignItem);
             AddCategoryCommand = new RelayCommand(AddCategory, CanAddCategory);
@@ -18,51 +18,66 @@ namespace ExpenseWatcher.ViewModels
             SaveCategoriesCommand = new RelayCommand(SaveCategory);
 
             Categories = Globals.Categories;
-
         }
 
         public ObservableCollection<Category> Categories { get; set; } = new ObservableCollection<Category>();
 
-        public ObservableCollection<string> UnassignedShops
+        private bool _isInfoAssignmentMode = true;
+        public bool IsInfoAssignmentMode
+        {
+            get => _isInfoAssignmentMode;
+            set
+            {
+                if (_isInfoAssignmentMode != value)
+                {
+                    _isInfoAssignmentMode = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(AssignmentToggleText));
+                    OnPropertyChanged(nameof(UnassignedItems));
+                    OnPropertyChanged(nameof(AssignedItems));
+                    SelectedAssigned = AssignedItems.FirstOrDefault();
+                    SelectedUnassigned = UnassignedItems.FirstOrDefault();
+                }
+            }
+        }
+
+        public string AssignmentToggleText => IsInfoAssignmentMode ? "Info" : "Empfänger";
+
+        public ObservableCollection<string> UnassignedItems
         {
             get
             {
-                var unassignedShops = new HashSet<string>();
-                foreach (var pay in Globals.Payments)
+                var unassignedValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (var payment in Globals.Payments)
                 {
-                    unassignedShops.Add(pay.Shop);
-                }
-                foreach (var cat in Categories)
-                {
-                    foreach (var shop in cat.AttachedShops)
+                    var value = IsInfoAssignmentMode ? payment.Info : payment.Shop;
+                    if (!string.IsNullOrWhiteSpace(value))
                     {
-                        if (unassignedShops.Contains(shop))
+                        unassignedValues.Add(value);
+                    }
+                }
+
+                foreach (var category in Categories)
+                {
+                    foreach (var item in category.GetAssignedValues(IsInfoAssignmentMode))
+                    {
+                        if (!string.IsNullOrWhiteSpace(item))
                         {
-                            unassignedShops.Remove(shop);
+                            unassignedValues.Remove(item);
                         }
                     }
                 }
-                unassignedShops = unassignedShops.OrderBy(o => o).ToHashSet();
-                var obs = new ObservableCollection<string>();
-                foreach (var shop in unassignedShops)
-                {
-                    obs.Add(shop);
-                }
 
-                return obs;
+                return new ObservableCollection<string>(
+                    unassignedValues.OrderBy(item => item, StringComparer.OrdinalIgnoreCase));
             }
         }
 
         private Category _selectedCategory;
-        /// <summary>
-        /// The category that is currently selected
-        /// </summary>
         public Category SelectedCategory
         {
-            get
-            {
-                return _selectedCategory;
-            }
+            get => _selectedCategory;
             set
             {
                 if (_selectedCategory != value)
@@ -71,21 +86,18 @@ namespace ExpenseWatcher.ViewModels
                     _newCategory = _selectedCategory?.Name;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(NewCategory));
+                    OnPropertyChanged(nameof(AssignedItems));
+                    OnPropertyChanged(nameof(UnassignedItems));
+                    SelectedAssigned = AssignedItems.FirstOrDefault();
+                    SelectedUnassigned = UnassignedItems.FirstOrDefault();
                 }
-
             }
         }
 
         private string _newCategory;
-        /// <summary>
-        /// A new category that can be added
-        /// </summary>
         public string NewCategory
         {
-            get
-            {
-                return _newCategory;
-            }
+            get => _newCategory;
             set
             {
                 if (_newCategory != value)
@@ -94,12 +106,8 @@ namespace ExpenseWatcher.ViewModels
                     OnPropertyChanged();
                 }
             }
-
         }
 
-        /// <summary>
-        /// Items assigned to this category
-        /// </summary>
         public ObservableCollection<string> AssignedItems
         {
             get
@@ -107,12 +115,12 @@ namespace ExpenseWatcher.ViewModels
                 var coll = new ObservableCollection<string>();
                 if (SelectedCategory != null)
                 {
-                    //var cat = Categories.FirstOrDefault(c => c.Name == SelectedCategory);
-                    foreach (var item in SelectedCategory.AttachedShops)
+                    foreach (var item in SelectedCategory.GetAssignedValues(IsInfoAssignmentMode))
                     {
                         coll.Add(item);
                     }
                 }
+
                 return coll;
             }
         }
@@ -120,10 +128,7 @@ namespace ExpenseWatcher.ViewModels
         public string _selectedAssigned;
         public string SelectedAssigned
         {
-            get
-            {
-                return _selectedAssigned;
-            }
+            get => _selectedAssigned;
             set
             {
                 if (_selectedAssigned != value)
@@ -131,17 +136,13 @@ namespace ExpenseWatcher.ViewModels
                     _selectedAssigned = value;
                     OnPropertyChanged();
                 }
-
             }
         }
 
         public string _selectedUnassigned;
         public string SelectedUnassigned
         {
-            get
-            {
-                return _selectedUnassigned;
-            }
+            get => _selectedUnassigned;
             set
             {
                 if (_selectedUnassigned != value)
@@ -149,143 +150,103 @@ namespace ExpenseWatcher.ViewModels
                     _selectedUnassigned = value;
                     OnPropertyChanged();
                 }
-
             }
         }
 
-        #region Add Category Command
-        /// <summary>
-        /// Command that handles adding of new categories to a list
-        /// </summary>
-        public RelayCommand AddCategoryCommand { get; private set; }
+        private ObservableCollection<string> GetCurrentAssignments(Category category)
+        {
+            return category == null ? new ObservableCollection<string>() : category.GetAssignedValues(IsInfoAssignmentMode);
+        }
 
-        /// <summary>
-        /// Adds a category to the list of categories
-        /// </summary>
-        /// <param name="o"></param>
+        private void RefreshCategoryLists()
+        {
+            OnPropertyChanged(nameof(AssignedItems));
+            OnPropertyChanged(nameof(UnassignedItems));
+            SelectedAssigned = AssignedItems.FirstOrDefault();
+            SelectedUnassigned = UnassignedItems.FirstOrDefault();
+        }
+
+        public RelayCommand AddCategoryCommand { get; private set; }
         public void AddCategory(object o)
         {
             Globals.Categories.Add(new Category(NewCategory, new List<string>()));
             SelectedCategory = Globals.Categories.FirstOrDefault(cat => cat.Name == NewCategory);
         }
-        /// <summary>
-        /// Defines if a categrory can be added
-        /// </summary>
-        /// <param name="o"></param>
-        /// <returns>true if this category does not already exist in the list</returns>
+
         public bool CanAddCategory(object o)
         {
-            return !string.IsNullOrEmpty(NewCategory?.Trim()) && !Globals.Categories.Any(cat => cat.Name == NewCategory);
+            return !string.IsNullOrEmpty(NewCategory?.Trim())
+                && !Globals.Categories.Any(cat => cat.Name == NewCategory);
         }
-        #endregion
 
-        #region Remove Category Command
-        /// <summary>
-        /// Command that handles removing of caregories from a list
-        /// </summary>
         public RelayCommand RemoveCategoryCommand { get; private set; }
-
-        /// <summary>
-        /// Removes a category from the list of categories
-        /// </summary>
-        /// <param name="o"></param>
         public void RemoveCategory(object o)
         {
             var cat = Globals.Categories.FirstOrDefault(c => c.Name == NewCategory);
-            Globals.Categories.Remove(cat);
+            if (cat != null)
+            {
+                Globals.Categories.Remove(cat);
+            }
+
             NewCategory = null;
-            OnPropertyChanged(nameof(UnassignedShops));
+            OnPropertyChanged(nameof(UnassignedItems));
             SelectedCategory = Categories.FirstOrDefault();
         }
-        /// <summary>
-        /// Defines if a categrory can be added
-        /// </summary>
-        /// <param name="o"></param>
-        /// <returns>true if the category exists in the list</returns>
+
         public bool CanRemoveCategory(object o)
         {
             return Globals.Categories.Any(cat => cat.Name == NewCategory);
         }
-        #endregion
 
-        #region Save Categories Command
-        /// <summary>
-        /// Command that handles adding of new categories to a list
-        /// </summary>
         public RelayCommand SaveCategoriesCommand { get; private set; }
-
-        /// <summary>
-        /// Adds a category to the list of categories
-        /// </summary>
-        /// <param name="o"></param>
         public void SaveCategory(object o)
         {
-            Task.Run(() =>
-            {
-                DataBaseHelper.SaveCategoriesToDB();
-            });
+            Task.Run(() => DataBaseHelper.SaveCategoriesToDB());
         }
 
-        #endregion
-
-        #region Assign Item Command
-        /// <summary>
-        /// Command that handles assignment of items to a category
-        /// </summary>
         public RelayCommand AssignItemCommand { get; private set; }
-
-        /// <summary>
-        /// Adds an itemto a category
-        /// </summary>
-        /// <param name="o"></param>
         public void AssignItem(object o)
         {
-            // add item to assigned items
-            SelectedCategory.AttachedShops.Add(SelectedUnassigned);
-            // remove from unassigned
-            OnPropertyChanged(nameof(UnassignedShops));
-            SelectedUnassigned = UnassignedShops.FirstOrDefault();
+            if (SelectedCategory == null || string.IsNullOrWhiteSpace(SelectedUnassigned))
+            {
+                return;
+            }
+
+            var target = GetCurrentAssignments(SelectedCategory);
+            if (!target.Any(item => string.Equals(item, SelectedUnassigned, StringComparison.OrdinalIgnoreCase)))
+            {
+                target.Add(SelectedUnassigned);
+            }
+
+            RefreshCategoryLists();
         }
-        /// <summary>
-        /// Defines if an item can be assigned
-        /// </summary>
-        /// <param name="o"></param>
-        /// <returns>true if there are any unassigned items</returns>
+
         public bool CanAssignItem(object o)
         {
             return SelectedUnassigned != null && SelectedCategory != null;
         }
 
-        #endregion
-
-        #region Unassign Item Command
-        /// <summary>
-        /// Command that handles removal of items from a category
-        /// </summary>
         public RelayCommand UnassignItemCommand { get; private set; }
-
-        /// <summary>
-        /// removes an item from a category
-        /// </summary>
-        /// <param name="o"></param>
         public void UnassignItem(object o)
         {
-            // add item to unassigned
-            //remove item from assigned
-            SelectedCategory.AttachedShops.Remove(SelectedAssigned);
-            SelectedAssigned = SelectedCategory.AttachedShops.FirstOrDefault();
-            OnPropertyChanged(nameof(UnassignedShops));
+            if (SelectedCategory == null || string.IsNullOrWhiteSpace(SelectedAssigned))
+            {
+                return;
+            }
+
+            var target = GetCurrentAssignments(SelectedCategory);
+            var toRemove = target.FirstOrDefault(item => string.Equals(item, SelectedAssigned, StringComparison.OrdinalIgnoreCase));
+            if (toRemove != null)
+            {
+                target.Remove(toRemove);
+            }
+
+            RefreshCategoryLists();
         }
-        /// <summary>
-        /// Defines if an item can be unassigned
-        /// </summary>
-        /// <param name="o"></param>
-        /// <returns>true if there is any assigned item</returns>
+
         public bool CanUnassignItem(object o)
         {
             return SelectedAssigned != null && SelectedCategory != null;
         }
-        #endregion
-
     }
 }

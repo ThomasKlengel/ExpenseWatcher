@@ -156,6 +156,37 @@ namespace ExpenseWatcher.ViewModels
                     .ToList();
             }
         }
+        private Category GetCategoryForPayment(Payment payment)
+        {
+            if (payment == null)
+            {
+                return null;
+            }
+
+            var infoCategory = Globals.Categories.FirstOrDefault(c => c.MatchesInfo(payment));
+            if (infoCategory != null)
+            {
+                return infoCategory;
+            }
+
+            return Globals.Categories.FirstOrDefault(c => c.MatchesShop(payment));
+        }
+
+        private bool IsPaymentInCategory(Payment payment, Category category)
+        {
+            if (payment == null || category == null)
+            {
+                return false;
+            }
+
+            if (category.MatchesInfo(payment))
+            {
+                return true;
+            }
+
+            return category.MatchesShop(payment);
+        }
+
         private List<Category> localCategories
         {
             get
@@ -168,7 +199,7 @@ namespace ExpenseWatcher.ViewModels
                         continue;
                     }
 
-                    var category = Globals.Categories.FirstOrDefault(c => c.AttachedShops.Contains(p.Shop));
+                    var category = GetCategoryForPayment(p);
                     if (category == null)
                     {
                         category = new Category("Others");
@@ -222,15 +253,10 @@ namespace ExpenseWatcher.ViewModels
                 {
                     var series = new PieSeries();
                     series.Title = cat.Name;
-                    // sum up the amount of payments to the category
-                    var sumPrice = 0.0;
-                    foreach (var shop in cat.AttachedShops)
-                    {
-                        localPayments.Where(p => p.Shop == shop)
-                            .Where(p=>p.Price < 0)
-                            .ToList().ForEach(p => { sumPrice += Math.Abs(p.Price); });
-                    }
-                    // add data to series collection
+                    var sumPrice = localPayments
+                        .Where(p => IsPaymentInCategory(p, cat))
+                        .Where(p => p.Price < 0)
+                        .Sum(p => Math.Abs(p.Price));
                     series.Values = new ChartValues<Double>() { sumPrice };
                     series.LabelPoint = chartPoint =>
                     string.Format($"{cat.Name} {chartPoint.Y:0.##}€ ({chartPoint.Participation:P})");
@@ -252,31 +278,25 @@ namespace ExpenseWatcher.ViewModels
                 var orderedCategories = new List<(Category category, int payCounter)>();
                 localCategories.ForEach(c =>
                 {
-                    var payments = localPayments.Count(p => c.AttachedShops.Contains(p.Shop));
+                    var payments = localPayments.Count(p => IsPaymentInCategory(p, c));
                     orderedCategories.Add((c, payments));
                 });
                 orderedCategories = orderedCategories.OrderByDescending(oc => oc.payCounter).ToList();
-                // go through each category...
                 foreach (var cat in orderedCategories.Select(oc => oc.category))
                 {
                     var series = new StackedColumnSeries();
                     series.Title = cat.Name;
-                    // sum up the amount of payments to the category
                     List<object> sumPrices = new List<object>();
                     for (int i = 12; i >= 0; i--)
                     {
-                        var sumX = 0.0;
-                        foreach (var shop in cat.AttachedShops)
-                        {
-                            localPayments.Where(p => p.Shop == shop)
-                                .Where(p => p.Price < 0)
-                                .Where(p => p.DateOfPayment > DateTimeOffset.Now.AddDays((-i - 1) * 7))
-                                .Where(p => p.DateOfPayment < DateTimeOffset.Now.AddDays(-i * 7))
-                                .ToList().ForEach(p => { sumX += Math.Abs(p.Price); });
-                        }
+                        var sumX = localPayments
+                            .Where(p => IsPaymentInCategory(p, cat))
+                            .Where(p => p.Price < 0)
+                            .Where(p => p.DateOfPayment > DateTimeOffset.Now.AddDays((-i - 1) * 7))
+                            .Where(p => p.DateOfPayment < DateTimeOffset.Now.AddDays(-i * 7))
+                            .Sum(p => Math.Abs(p.Price));
                         sumPrices.Add(sumX);
                     }
-                    // add data to series collection
                     series.Values = new ChartValues<Double>();
                     series.Values.AddRange(sumPrices);
                     series.LabelPoint = chartPoint =>
@@ -306,20 +326,20 @@ namespace ExpenseWatcher.ViewModels
                     localPayments.ForEach(p => sumPrices.Add(new DateTimePoint(new DateTime(p.DateOfPayment.Ticks), 0)));
                     sumPrices.Add(new DateTimePoint(DateTime.Today.AddDays(2), 0));
 
-                    // put all pyaments of the category into the list
-                    foreach (var shop in cat.AttachedShops)
-                    {
-                        localPayments
-                            .Where(p => p.Shop == shop)
-                            .OrderBy(p => p.DateOfPayment)
-                            .ToList().Where(p => p.Price < 0).ToList().ForEach(p =>
+                    localPayments
+                        .Where(p => IsPaymentInCategory(p, cat))
+                        .OrderBy(p => p.DateOfPayment)
+                        .Where(p => p.Price < 0)
+                        .ToList()
+                        .ForEach(p =>
+                        {
+                            var dt = new DateTime(p.DateOfPayment.Ticks);
+                            var match = sumPrices.FirstOrDefault(sum => sum.DateTime == dt);
+                            if (match != null)
                             {
-                                var dt = new DateTime(p.DateOfPayment.Ticks);
-                                sumPrices.Where(sum => sum.DateTime == dt)
-                                .FirstOrDefault().Value = Math.Abs(p.Price);
-                                //payInCat.Add(p);
-                            });
-                    }
+                                match.Value = Math.Abs(p.Price);
+                            }
+                        });
 
                     // sum up the price with the previous one, so we get an ascending sum
                     
